@@ -28,7 +28,7 @@ export default function MainTabs() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E0E0E0',
-          height: 60,
+          height: 75,
           paddingBottom: 8,
           paddingTop: 8,
         },

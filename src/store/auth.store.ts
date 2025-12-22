@@ -74,10 +74,18 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      // Store tokens securely
-      await secureStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, tokens.accessToken);
-      await secureStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken);
-      await secureStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+      // Store tokens securely (with error handling)
+      try {
+        await secureStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, tokens.accessToken);
+        await secureStorage.setItem(
+          STORAGE_KEYS.REFRESH_TOKEN,
+          tokens.refreshToken
+        );
+        await secureStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+      } catch (storageError) {
+        console.warn('Failed to store auth data securely:', storageError);
+        // Continue anyway - auth will work but won't persist
+      }
 
       // Update state
       set({

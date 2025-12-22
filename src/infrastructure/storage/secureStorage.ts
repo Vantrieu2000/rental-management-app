@@ -1,9 +1,35 @@
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 /**
  * Secure storage wrapper using Expo SecureStore
  * Provides encrypted storage for sensitive data like tokens
+ * Falls back to AsyncStorage on web
  */
+
+// Check if SecureStore is available (not on web)
+const isSecureStoreAvailable = Platform.OS !== 'web';
+
+// Fallback storage for web (using localStorage)
+const webStorage = {
+  async setItem(key: string, value: string): Promise<void> {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(key, value);
+    }
+  },
+  async getItem(key: string): Promise<string | null> {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem(key);
+    }
+    return null;
+  },
+  async removeItem(key: string): Promise<void> {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.removeItem(key);
+    }
+  },
+};
+
 export const secureStorage = {
   /**
    * Save a value securely
@@ -12,7 +38,11 @@ export const secureStorage = {
    */
   async setItem(key: string, value: string): Promise<void> {
     try {
-      await SecureStore.setItemAsync(key, value);
+      if (isSecureStoreAvailable) {
+        await SecureStore.setItemAsync(key, value);
+      } else {
+        await webStorage.setItem(key, value);
+      }
     } catch (error) {
       console.error(`Error saving ${key} to secure storage:`, error);
       throw error;
@@ -26,7 +56,11 @@ export const secureStorage = {
    */
   async getItem(key: string): Promise<string | null> {
     try {
-      return await SecureStore.getItemAsync(key);
+      if (isSecureStoreAvailable) {
+        return await SecureStore.getItemAsync(key);
+      } else {
+        return await webStorage.getItem(key);
+      }
     } catch (error) {
       console.error(`Error retrieving ${key} from secure storage:`, error);
       return null;
@@ -39,7 +73,11 @@ export const secureStorage = {
    */
   async removeItem(key: string): Promise<void> {
     try {
-      await SecureStore.deleteItemAsync(key);
+      if (isSecureStoreAvailable) {
+        await SecureStore.deleteItemAsync(key);
+      } else {
+        await webStorage.removeItem(key);
+      }
     } catch (error) {
       console.error(`Error removing ${key} from secure storage:`, error);
       throw error;
