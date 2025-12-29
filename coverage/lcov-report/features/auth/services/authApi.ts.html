@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">18.51% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/81</span>
+                <span class='fraction'>15/81</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">12.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/40</span>
+                <span class='fraction'>5/40</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">18.18% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>2/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">19.73% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/76</span>
+                <span class='fraction'>15/76</span>
             </div>
         
             
@@ -278,19 +278,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">500x</span>
+<span class="cline-any cline-yes">500x</span>
+<span class="cline-any cline-yes">500x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">500x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -299,21 +299,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">400x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">400x</span>
+<span class="cline-any cline-yes">400x</span>
+<span class="cline-any cline-yes">300x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">500x</span>
+<span class="cline-any cline-yes">500x</span>
+<span class="cline-any cline-yes">100x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">400x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -466,7 +466,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * Authentication API Client
  * Handles all authentication-related API calls
@@ -479,20 +479,20 @@ class AuthApiClient {
   private baseUrl: string;
   private timeout: number;
 &nbsp;
-<span class="fstat-no" title="function not covered" >  co</span>nstructor() {
-<span class="cstat-no" title="statement not covered" >    this.baseUrl = env.apiUrl;</span>
-<span class="cstat-no" title="statement not covered" >    this.timeout = env.apiTimeout;</span>
+  constructor() {
+    this.baseUrl = env.apiUrl;
+    this.timeout = env.apiTimeout;
   }
 &nbsp;
   /**
    * Login with email and password
    */
-<span class="fstat-no" title="function not covered" >  as</span>ync login(credentials: LoginCredentials): Promise&lt;LoginResponse&gt; {
-<span class="cstat-no" title="statement not covered" >    try {</span>
-      const controller = <span class="cstat-no" title="statement not covered" >new AbortController();</span>
-      const timeoutId = <span class="cstat-no" title="statement not covered" >setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >controller.abort(),</span> this.timeout);</span>
+  async login(credentials: LoginCredentials): Promise&lt;LoginResponse&gt; {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >controller.abort(),</span> this.timeout);
 &nbsp;
-      const response = <span class="cstat-no" title="statement not covered" >await fetch(`${this.baseUrl}/auth/login`, {</span>
+      const response = await fetch(`${this.baseUrl}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -501,21 +501,21 @@ class AuthApiClient {
         signal: controller.signal,
       });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      clearTimeout(timeoutId);</span>
+      clearTimeout(timeoutId);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (!response.ok) {</span>
-        const error = <span class="cstat-no" title="statement not covered" >await response.json();</span>
-<span class="cstat-no" title="statement not covered" >        throw new Error(error.message || 'Login failed');</span>
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || <span class="branch-1 cbranch-no" title="branch not covered" >'Login failed')</span>;
       }
 &nbsp;
       const data = <span class="cstat-no" title="statement not covered" >await response.json();</span>
 <span class="cstat-no" title="statement not covered" >      return data;</span>
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      if (error instanceof Error) {</span>
-<span class="cstat-no" title="statement not covered" >        if (error.name === 'AbortError') {</span>
-<span class="cstat-no" title="statement not covered" >          throw new Error('Request timeout');</span>
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Request timeout');
         }
-<span class="cstat-no" title="statement not covered" >        throw error;</span>
+        throw error;
       }
 <span class="cstat-no" title="statement not covered" >      throw new Error('An unexpected error occurred');</span>
     }
@@ -668,7 +668,7 @@ class AuthApiClient {
   }
 }
 &nbsp;
-export const authApi = <span class="cstat-no" title="statement not covered" >new AuthApiClient();</span>
+export const authApi = new AuthApiClient();
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -676,7 +676,7 @@ export const authApi = <span class="cstat-no" title="statement not covered" >new
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-16T06:04:08.975Z
+                at 2025-12-29T05:39:41.523Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

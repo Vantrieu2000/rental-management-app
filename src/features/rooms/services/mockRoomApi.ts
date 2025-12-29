@@ -350,6 +350,20 @@ class MockRoomApiClient {
 
     return results;
   }
+
+  /**
+   * Reset mock data (for testing)
+   */
+  resetMockData(): void {
+    mockRooms = [];
+  }
+
+  /**
+   * Add test room data directly (for testing)
+   */
+  addTestRoom(room: Room): void {
+    mockRooms.push(room);
+  }
 }
 
 export const mockRoomApi = new MockRoomApiClient();

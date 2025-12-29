@@ -25,17 +25,19 @@ const operationArbitrary = () =>
   fc.constantFrom('create', 'update', 'delete') as fc.Arbitrary<PendingChange['operation']>;
 
 const pendingChangeArbitrary = (): fc.Arbitrary<Omit<PendingChange, 'id' | 'retryCount'>> =>
-  fc.record({
-    entityType: entityTypeArbitrary(),
-    entityId: fc.uuid(),
-    operation: operationArbitrary(),
-    data: fc.record({
-      id: fc.uuid(),
-      name: fc.string({ minLength: 1, maxLength: 100 }),
-      value: fc.double({ min: 0, max: 1000000, noNaN: true }),
-    }),
-    timestamp: fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }),
-  });
+  fc
+    .record({
+      entityType: entityTypeArbitrary(),
+      entityId: fc.uuid(),
+      operation: operationArbitrary(),
+      data: fc.record({
+        id: fc.uuid(),
+        name: fc.string({ minLength: 1, maxLength: 100 }),
+        value: fc.double({ min: 0, max: 1000000, noNaN: true }),
+      }),
+      timestamp: fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }),
+    })
+    .filter((change) => !isNaN(change.timestamp.getTime()));
 
 describe('Offline Change Queuing Property Tests', () => {
   beforeAll(async () => {
@@ -96,6 +98,9 @@ describe('Offline Change Queuing Property Tests', () => {
       fc.asyncProperty(
         fc.array(pendingChangeArbitrary(), { minLength: 1, maxLength: 10 }),
         async (changes) => {
+          // Clear realm before each iteration
+          await clearRealm();
+          
           // Queue all changes
           changes.forEach((change) => queueChange(change));
 
@@ -103,7 +108,7 @@ describe('Offline Change Queuing Property Tests', () => {
           const pendingChanges = getPendingChanges();
 
           // Verify all changes were queued
-          expect(pendingChanges.length).toBeGreaterThanOrEqual(changes.length);
+          expect(pendingChanges.length).toBe(changes.length);
 
           // Verify each change is in the queue
           changes.forEach((change) => {
@@ -163,6 +168,9 @@ describe('Offline Change Queuing Property Tests', () => {
       fc.asyncProperty(
         fc.array(pendingChangeArbitrary(), { minLength: 0, maxLength: 10 }),
         async (changes) => {
+          // Clear realm before each iteration
+          await clearRealm();
+          
           // Queue all changes
           changes.forEach((change) => queueChange(change));
 
@@ -172,6 +180,7 @@ describe('Offline Change Queuing Property Tests', () => {
 
           // Verify count matches actual queue size
           expect(count).toBe(pendingChanges.length);
+          expect(count).toBe(changes.length);
         }
       ),
       { numRuns: 100 }

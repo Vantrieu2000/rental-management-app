@@ -27,6 +27,15 @@ jest.mock('expo-local-authentication', () => ({
   },
 }));
 
+jest.mock('expo-notifications', () => ({
+  setNotificationHandler: jest.fn(),
+  scheduleNotificationAsync: jest.fn().mockResolvedValue('mock-notification-id'),
+  cancelAllScheduledNotificationsAsync: jest.fn().mockResolvedValue(undefined),
+  getPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
+  requestPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
+  getAllScheduledNotificationsAsync: jest.fn().mockResolvedValue([]),
+}));
+
 // Mock NetInfo
 jest.mock('@react-native-community/netinfo', () => ({
   fetch: jest.fn(() =>

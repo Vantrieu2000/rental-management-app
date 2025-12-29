@@ -25,6 +25,7 @@ export type MainTabParamList = {
   DashboardTab: NavigatorScreenParams<DashboardStackParamList>;
   RoomsTab: NavigatorScreenParams<RoomsStackParamList>;
   PaymentsTab: NavigatorScreenParams<PaymentsStackParamList>;
+  NotificationsTab: NavigatorScreenParams<NotificationsStackParamList>;
   ReportsTab: NavigatorScreenParams<ReportsStackParamList>;
   SettingsTab: NavigatorScreenParams<SettingsStackParamList>;
 };
@@ -46,9 +47,14 @@ export type RoomsStackParamList = {
 // Payments Stack
 export type PaymentsStackParamList = {
   PaymentList: undefined;
-  RecordPayment: { roomId?: string };
-  PaymentHistory: { roomId: string };
-  PaymentDetail: { paymentId: string };
+  RecordPayment: { payment: any }; // PaymentRecord type
+  PaymentHistory: { roomId: string; propertyId: string };
+  PaymentDetail: { payment: any }; // PaymentRecord type
+};
+
+// Notifications Stack
+export type NotificationsStackParamList = {
+  NotificationsList: undefined;
 };
 
 // Reports Stack
@@ -97,6 +103,9 @@ export type RoomsStackScreenProps<T extends keyof RoomsStackParamList> = NativeS
 
 export type PaymentsStackScreenProps<T extends keyof PaymentsStackParamList> =
   NativeStackScreenProps<PaymentsStackParamList, T>;
+
+export type NotificationsStackScreenProps<T extends keyof NotificationsStackParamList> =
+  NativeStackScreenProps<NotificationsStackParamList, T>;
 
 export type ReportsStackScreenProps<T extends keyof ReportsStackParamList> = NativeStackScreenProps<
   ReportsStackParamList,

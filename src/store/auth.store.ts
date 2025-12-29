@@ -146,29 +146,39 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       set({ isLoading: true });
 
-      // Retrieve stored data
-      const [accessToken, refreshToken, userData] = await Promise.all([
-        secureStorage.getItem(STORAGE_KEYS.AUTH_TOKEN),
-        secureStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN),
-        secureStorage.getItem(STORAGE_KEYS.USER_DATA),
-      ]);
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Session restore timeout')), 5000);
+      });
 
-      if (accessToken && refreshToken && userData) {
-        const user = JSON.parse(userData) as User;
+      const restorePromise = (async () => {
+        // Retrieve stored data
+        const [accessToken, refreshToken, userData] = await Promise.all([
+          secureStorage.getItem(STORAGE_KEYS.AUTH_TOKEN),
+          secureStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN),
+          secureStorage.getItem(STORAGE_KEYS.USER_DATA),
+        ]);
 
-        set({
-          user,
-          accessToken,
-          refreshToken,
-          isAuthenticated: true,
-          isLoading: false,
-        });
-      } else {
-        set({ isLoading: false });
-      }
+        if (accessToken && refreshToken && userData) {
+          const user = JSON.parse(userData) as User;
+
+          set({
+            user,
+            accessToken,
+            refreshToken,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+        } else {
+          set({ isLoading: false });
+        }
+      })();
+
+      await Promise.race([restorePromise, timeoutPromise]);
     } catch (error) {
       console.error('Failed to restore session:', error);
-      set({ isLoading: false });
+      // Always set loading to false, even on error
+      set({ isLoading: false, isAuthenticated: false });
     }
   },
 }));

@@ -12,12 +12,22 @@ import type { MainTabParamList } from '@/shared/types/navigation';
 import DashboardStack from './DashboardStack';
 import RoomsStack from './RoomsStack';
 import PaymentsStack from './PaymentsStack';
+import NotificationsStack from './NotificationsStack';
 import ReportsStack from './ReportsStack';
 import SettingsStack from './SettingsStack';
+
+// Hooks
+import { useNotificationSummary } from '@/features/notifications/hooks/useNotifications';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabs() {
+  // Get notification count for badge
+  const { data: notificationSummary } = useNotificationSummary();
+  const notificationCount = notificationSummary
+    ? notificationSummary.totalUnpaid + notificationSummary.totalOverdue
+    : 0;
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -67,6 +77,23 @@ export default function MainTabs() {
           tabBarIcon: ({ color, size }) => (
             <TabIcon name="payments" color={color} size={size} />
           ),
+        }}
+      />
+      <Tab.Screen
+        name="NotificationsTab"
+        component={NotificationsStack}
+        options={{
+          tabBarLabel: 'Notifications',
+          tabBarIcon: ({ color, size }) => (
+            <TabIcon name="notifications" color={color} size={size} />
+          ),
+          tabBarBadge: notificationCount > 0 ? notificationCount : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: '#D32F2F',
+            color: '#FFFFFF',
+            fontSize: 10,
+            fontWeight: '700',
+          },
         }}
       />
       <Tab.Screen

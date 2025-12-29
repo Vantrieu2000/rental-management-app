@@ -83,6 +83,10 @@ describe('Offline Sync Round-Trip Property Tests', () => {
           (room) => !isNaN(room.createdAt.getTime()) && !isNaN(room.updatedAt.getTime())
         ),
         async (room) => {
+          // Clear mocks and realm before each iteration
+          jest.clearAllMocks();
+          await clearRealm();
+          
           // Mock successful API response
           mockApiClient.createRoom.mockResolvedValue(room);
 
@@ -97,12 +101,13 @@ describe('Offline Sync Round-Trip Property Tests', () => {
 
           // Verify change is queued
           const pendingBefore = getPendingChanges();
-          expect(pendingBefore.length).toBeGreaterThan(0);
+          expect(pendingBefore.length).toBe(1);
 
           // Sync pending changes (simulating reconnection)
           await syncPendingChanges();
 
-          // Verify API was called
+          // Verify API was called with the correct data
+          expect(mockApiClient.createRoom).toHaveBeenCalledTimes(1);
           expect(mockApiClient.createRoom).toHaveBeenCalledWith(room);
 
           // Verify change was removed from queue
@@ -130,6 +135,10 @@ describe('Offline Sync Round-Trip Property Tests', () => {
           (room) => !isNaN(room.createdAt.getTime()) && !isNaN(room.updatedAt.getTime())
         ),
         async (room) => {
+          // Clear mocks and realm before each iteration
+          jest.clearAllMocks();
+          await clearRealm();
+          
           // Mock successful API response
           mockApiClient.updateRoom.mockResolvedValue(room);
 
@@ -145,7 +154,8 @@ describe('Offline Sync Round-Trip Property Tests', () => {
           // Sync pending changes
           await syncPendingChanges();
 
-          // Verify API was called
+          // Verify API was called with the correct data
+          expect(mockApiClient.updateRoom).toHaveBeenCalledTimes(1);
           expect(mockApiClient.updateRoom).toHaveBeenCalledWith(room.id, room);
 
           // Verify change was removed from queue
@@ -222,6 +232,10 @@ describe('Offline Sync Round-Trip Property Tests', () => {
             }))
           ),
         async (rooms) => {
+          // Clear mocks and realm before each iteration
+          jest.clearAllMocks();
+          await clearRealm();
+          
           // Mock successful API responses
           rooms.forEach((room) => {
             mockApiClient.createRoom.mockResolvedValue(room);
@@ -240,7 +254,7 @@ describe('Offline Sync Round-Trip Property Tests', () => {
 
           // Verify all changes are queued
           const pendingBefore = getPendingChanges();
-          expect(pendingBefore.length).toBeGreaterThanOrEqual(rooms.length);
+          expect(pendingBefore.length).toBe(rooms.length);
 
           // Sync pending changes
           await syncPendingChanges();
@@ -250,6 +264,8 @@ describe('Offline Sync Round-Trip Property Tests', () => {
 
           // Verify all changes were removed from queue
           const pendingAfter = getPendingChanges();
+          expect(pendingAfter.length).toBe(0);
+          
           rooms.forEach((room) => {
             const stillPending = pendingAfter.find(
               (c) => c.entityId === room.id && c.operation === 'create'
