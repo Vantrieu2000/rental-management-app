@@ -13,175 +13,8 @@
 
 import { Room, CreateRoomDto, UpdateRoomDto, RoomFilters, RoomWithTenant } from '../types';
 
-// Fake rooms data
-let mockRooms: Room[] = [
-  // Property 1: Nhà trọ Hòa Bình
-  {
-    id: 'room-1',
-    propertyId: '1',
-    roomCode: 'P101',
-    roomName: 'Phòng 101',
-    status: 'occupied',
-    rentalPrice: 3000000,
-    electricityFee: 3500,
-    waterFee: 20000,
-    garbageFee: 30000,
-    parkingFee: 100000,
-    currentTenantId: 'tenant-1',
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-15'),
-  },
-  {
-    id: 'room-2',
-    propertyId: '1',
-    roomCode: 'P102',
-    roomName: 'Phòng 102',
-    status: 'occupied',
-    rentalPrice: 3200000,
-    electricityFee: 3500,
-    waterFee: 20000,
-    garbageFee: 30000,
-    parkingFee: 100000,
-    currentTenantId: 'tenant-2',
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-15'),
-  },
-  {
-    id: 'room-3',
-    propertyId: '1',
-    roomCode: 'P103',
-    roomName: 'Phòng 103',
-    status: 'vacant',
-    rentalPrice: 3000000,
-    electricityFee: 3500,
-    waterFee: 20000,
-    garbageFee: 30000,
-    parkingFee: 100000,
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-15'),
-  },
-  {
-    id: 'room-4',
-    propertyId: '1',
-    roomCode: 'P201',
-    roomName: 'Phòng 201',
-    status: 'occupied',
-    rentalPrice: 3500000,
-    electricityFee: 3500,
-    waterFee: 20000,
-    garbageFee: 30000,
-    parkingFee: 100000,
-    currentTenantId: 'tenant-3',
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-15'),
-  },
-  {
-    id: 'room-5',
-    propertyId: '1',
-    roomCode: 'P202',
-    roomName: 'Phòng 202',
-    status: 'maintenance',
-    rentalPrice: 3500000,
-    electricityFee: 3500,
-    waterFee: 20000,
-    garbageFee: 30000,
-    parkingFee: 100000,
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-15'),
-  },
-
-  // Property 2: Chung cư Mini An Phú
-  {
-    id: 'room-6',
-    propertyId: '2',
-    roomCode: 'A101',
-    roomName: 'Căn A101',
-    status: 'occupied',
-    rentalPrice: 4000000,
-    electricityFee: 3800,
-    waterFee: 25000,
-    garbageFee: 35000,
-    parkingFee: 150000,
-    currentTenantId: 'tenant-4',
-    createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-02-01'),
-  },
-  {
-    id: 'room-7',
-    propertyId: '2',
-    roomCode: 'A102',
-    roomName: 'Căn A102',
-    status: 'occupied',
-    rentalPrice: 4200000,
-    electricityFee: 3800,
-    waterFee: 25000,
-    garbageFee: 35000,
-    parkingFee: 150000,
-    currentTenantId: 'tenant-5',
-    createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-02-01'),
-  },
-  {
-    id: 'room-8',
-    propertyId: '2',
-    roomCode: 'B101',
-    roomName: 'Căn B101',
-    status: 'vacant',
-    rentalPrice: 3800000,
-    electricityFee: 3800,
-    waterFee: 25000,
-    garbageFee: 35000,
-    parkingFee: 150000,
-    createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-02-01'),
-  },
-
-  // Property 3: Nhà trọ Sinh Viên
-  {
-    id: 'room-9',
-    propertyId: '3',
-    roomCode: 'SV01',
-    roomName: 'Phòng SV01',
-    status: 'occupied',
-    rentalPrice: 2000000,
-    electricityFee: 3200,
-    waterFee: 18000,
-    garbageFee: 25000,
-    parkingFee: 80000,
-    currentTenantId: 'tenant-6',
-    createdAt: new Date('2024-03-10'),
-    updatedAt: new Date('2024-03-10'),
-  },
-  {
-    id: 'room-10',
-    propertyId: '3',
-    roomCode: 'SV02',
-    roomName: 'Phòng SV02',
-    status: 'occupied',
-    rentalPrice: 2000000,
-    electricityFee: 3200,
-    waterFee: 18000,
-    garbageFee: 25000,
-    parkingFee: 80000,
-    currentTenantId: 'tenant-7',
-    createdAt: new Date('2024-03-10'),
-    updatedAt: new Date('2024-03-10'),
-  },
-  {
-    id: 'room-11',
-    propertyId: '3',
-    roomCode: 'SV03',
-    roomName: 'Phòng SV03',
-    status: 'vacant',
-    rentalPrice: 2000000,
-    electricityFee: 3200,
-    waterFee: 18000,
-    garbageFee: 25000,
-    parkingFee: 80000,
-    createdAt: new Date('2024-03-10'),
-    updatedAt: new Date('2024-03-10'),
-  },
-];
+// Fake rooms data - EMPTY (use real backend)
+let mockRooms: Room[] = [];
 
 // Mock tenant data for rooms
 const mockTenants: Record<string, { id: string; name: string; phone: string }> = {
@@ -200,7 +33,7 @@ class MockRoomApiClient {
   /**
    * Get all rooms with filters
    */
-  async getRooms(accessToken: string, filters?: RoomFilters): Promise<Room[]> {
+  async getRooms(accessToken: string, filters?: RoomFilters): Promise<{ data: Room[]; total: number }> {
     await delay();
 
     let filtered = [...mockRooms];
@@ -211,17 +44,21 @@ class MockRoomApiClient {
     }
 
     // Filter by status
-    if (filters?.status) {
-      filtered = filtered.filter((r) => r.status === filters.status);
+    if (filters?.status && filters.status.length > 0) {
+      filtered = filtered.filter((r) => filters.status!.includes(r.status));
     }
 
-    // Search by code or name
-    if (filters?.search) {
-      const searchLower = filters.search.toLowerCase();
+    // Filter by payment status (mock - just return all for now)
+    // In real app, this would check payment records
+
+    // Search by code, name, or tenant
+    if (filters?.searchQuery) {
+      const searchLower = filters.searchQuery.toLowerCase();
       filtered = filtered.filter(
         (r) =>
           r.roomCode.toLowerCase().includes(searchLower) ||
-          r.roomName.toLowerCase().includes(searchLower)
+          r.roomName.toLowerCase().includes(searchLower) ||
+          (r.currentTenantId && mockTenants[r.currentTenantId]?.name.toLowerCase().includes(searchLower))
       );
     }
 
@@ -233,7 +70,10 @@ class MockRoomApiClient {
       filtered = filtered.filter((r) => r.rentalPrice <= filters.maxPrice!);
     }
 
-    return filtered;
+    return {
+      data: filtered,
+      total: filtered.length,
+    };
   }
 
   /**

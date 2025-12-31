@@ -1,19 +1,19 @@
-/**
- * Properties Feature Exports
- */
+// Components
+export * from './components/PropertyCard';
+export * from './components/PropertyStatistics';
+export * from './components/PropertyFormModal';
+export * from './components/DeleteConfirmationDialog';
+export * from './components/EmptyState';
+export * from './components/PropertiesSection';
+
+// Hooks
+export * from './hooks/useProperties';
 
 // Types
 export * from './types';
 
 // Services
-export { propertyApi } from './services/propertyApi';
+export { propertyService } from './services/propertyService';
 
-// Store
-export { usePropertyStore } from './store/propertyStore';
-
-// Hooks
-export * from './hooks/useProperties';
-
-// Screens
-export { PropertyListScreen } from './screens/PropertyListScreen';
-export { AddEditPropertyScreen } from './screens/AddEditPropertyScreen';
+// Utils
+export * from './utils/errorHandler';

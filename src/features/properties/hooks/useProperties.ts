@@ -1,182 +1,118 @@
-/**
- * Property Hooks
- * TanStack Query hooks for property management
- */
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuthStore } from '@/store/auth.store';
-import { getPropertyApi } from '../services/propertyApi';
-import { usePropertyStore } from '../store/propertyStore';
-
-// Get the appropriate API client (mock or real)
-const propertyApi = getPropertyApi();
+import { useTranslation } from 'react-i18next';
+import { propertyService } from '../services/propertyService';
 import {
   Property,
   CreatePropertyDto,
   UpdatePropertyDto,
-  PropertyFilters,
+  PropertyStatistics,
 } from '../types';
+import { handlePropertyError } from '../utils/errorHandler';
 
-// Query keys
+// Query Keys Factory
 export const propertyKeys = {
   all: ['properties'] as const,
   lists: () => [...propertyKeys.all, 'list'] as const,
-  list: (filters?: PropertyFilters) => [...propertyKeys.lists(), filters] as const,
+  list: () => [...propertyKeys.lists()] as const,
   details: () => [...propertyKeys.all, 'detail'] as const,
   detail: (id: string) => [...propertyKeys.details(), id] as const,
-  statistics: (id: string) => [...propertyKeys.all, 'statistics', id] as const,
+  statistics: () => [...propertyKeys.all, 'statistics'] as const,
 };
 
 /**
  * Hook to fetch all properties
  */
-export const useProperties = (filters?: PropertyFilters) => {
-  const accessToken = useAuthStore((state) => state.accessToken);
-  const setProperties = usePropertyStore((state) => state.setProperties);
-
+export function useProperties() {
   return useQuery({
-    queryKey: propertyKeys.list(filters),
-    queryFn: async () => {
-      if (!accessToken) {
-        throw new Error('Not authenticated');
-      }
-      const properties = await propertyApi.getProperties(accessToken, filters);
-      setProperties(properties);
-      return properties;
-    },
-    enabled: !!accessToken,
+    queryKey: propertyKeys.list(),
+    queryFn: () => propertyService.getProperties(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
-};
-
-/**
- * Hook to fetch a single property by ID
- */
-export const useProperty = (id: string) => {
-  const accessToken = useAuthStore((state) => state.accessToken);
-
-  return useQuery({
-    queryKey: propertyKeys.detail(id),
-    queryFn: async () => {
-      if (!accessToken) {
-        throw new Error('Not authenticated');
-      }
-      return await propertyApi.getPropertyById(accessToken, id);
-    },
-    enabled: !!accessToken && !!id,
-  });
-};
+}
 
 /**
  * Hook to fetch property statistics
  */
-export const usePropertyStatistics = (id: string) => {
-  const accessToken = useAuthStore((state) => state.accessToken);
-
+export function usePropertyStatistics() {
   return useQuery({
-    queryKey: propertyKeys.statistics(id),
-    queryFn: async () => {
-      if (!accessToken) {
-        throw new Error('Not authenticated');
-      }
-      return await propertyApi.getPropertyStatistics(accessToken, id);
-    },
-    enabled: !!accessToken && !!id,
+    queryKey: propertyKeys.statistics(),
+    queryFn: () => propertyService.getPropertyStatistics(),
+    staleTime: 5 * 60 * 1000,
   });
-};
+}
+
+/**
+ * Hook to fetch a single property by ID
+ */
+export function useProperty(id: string) {
+  return useQuery({
+    queryKey: propertyKeys.detail(id),
+    queryFn: () => propertyService.getPropertyById(id),
+    enabled: !!id,
+  });
+}
 
 /**
  * Hook to create a new property
  */
-export const useCreateProperty = () => {
+export function useCreateProperty() {
   const queryClient = useQueryClient();
-  const accessToken = useAuthStore((state) => state.accessToken);
-  const addProperty = usePropertyStore((state) => state.addProperty);
+  const { t } = useTranslation();
 
   return useMutation({
-    mutationFn: async (data: CreatePropertyDto) => {
-      if (!accessToken) {
-        throw new Error('Not authenticated');
-      }
-      return await propertyApi.createProperty(accessToken, data);
+    mutationFn: (data: CreatePropertyDto) => propertyService.createProperty(data),
+    onSuccess: () => {
+      // Invalidate and refetch properties list and statistics
+      queryClient.invalidateQueries({ queryKey: propertyKeys.all });
     },
-    onSuccess: (property) => {
-      // Invalidate and refetch properties list
-      queryClient.invalidateQueries({ queryKey: propertyKeys.lists() });
-      // Add to store
-      addProperty(property);
+    onError: (error) => {
+      const message = handlePropertyError(error, t);
+      console.error('Create property error:', message);
+      // Error will be handled by the component
     },
   });
-};
+}
 
 /**
- * Hook to update a property
+ * Hook to update an existing property
  */
-export const useUpdateProperty = () => {
+export function useUpdateProperty() {
   const queryClient = useQueryClient();
-  const accessToken = useAuthStore((state) => state.accessToken);
-  const updatePropertyInStore = usePropertyStore((state) => state.updateProperty);
+  const { t } = useTranslation();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: string;
-      data: UpdatePropertyDto;
-    }) => {
-      if (!accessToken) {
-        throw new Error('Not authenticated');
-      }
-      return await propertyApi.updateProperty(accessToken, id, data);
+    mutationFn: ({ id, data }: { id: string; data: UpdatePropertyDto }) =>
+      propertyService.updateProperty(id, data),
+    onSuccess: (_, variables) => {
+      // Invalidate specific property and lists
+      queryClient.invalidateQueries({ queryKey: propertyKeys.detail(variables.id) });
+      queryClient.invalidateQueries({ queryKey: propertyKeys.all });
     },
-    onSuccess: (property) => {
-      // Invalidate queries
-      queryClient.invalidateQueries({ queryKey: propertyKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: propertyKeys.detail(property.id) });
-      queryClient.invalidateQueries({
-        queryKey: propertyKeys.statistics(property.id),
-      });
-      // Update store
-      updatePropertyInStore(property.id, property);
+    onError: (error) => {
+      const message = handlePropertyError(error, t);
+      console.error('Update property error:', message);
+      // Error will be handled by the component
     },
   });
-};
+}
 
 /**
  * Hook to delete a property
  */
-export const useDeleteProperty = () => {
+export function useDeleteProperty() {
   const queryClient = useQueryClient();
-  const accessToken = useAuthStore((state) => state.accessToken);
-  const removeProperty = usePropertyStore((state) => state.removeProperty);
+  const { t } = useTranslation();
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      if (!accessToken) {
-        throw new Error('Not authenticated');
-      }
-      await propertyApi.deleteProperty(accessToken, id);
-      return id;
+    mutationFn: (id: string) => propertyService.deleteProperty(id),
+    onSuccess: () => {
+      // Invalidate properties list and statistics
+      queryClient.invalidateQueries({ queryKey: propertyKeys.all });
     },
-    onSuccess: (id) => {
-      // Invalidate queries
-      queryClient.invalidateQueries({ queryKey: propertyKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: propertyKeys.detail(id) });
-      // Remove from store
-      removeProperty(id);
+    onError: (error) => {
+      const message = handlePropertyError(error, t);
+      console.error('Delete property error:', message);
+      // Error will be handled by the component
     },
   });
-};
-
-/**
- * Hook to get the currently selected property
- */
-export const useSelectedProperty = () => {
-  const selectedPropertyId = usePropertyStore((state) => state.selectedPropertyId);
-  const getSelectedProperty = usePropertyStore((state) => state.getSelectedProperty);
-
-  return {
-    selectedPropertyId,
-    selectedProperty: getSelectedProperty(),
-  };
-};
+}

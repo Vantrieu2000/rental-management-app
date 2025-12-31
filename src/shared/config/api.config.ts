@@ -4,7 +4,7 @@
  */
 
 // Set this to false when backend is ready
-export const USE_MOCK_API = true;
+export const USE_MOCK_API = false;
 
 // API endpoints will be configured here
 export const API_CONFIG = {
@@ -20,6 +20,7 @@ export const API_CONFIG = {
     payments: USE_MOCK_API,
     reports: USE_MOCK_API,
     maintenance: USE_MOCK_API,
+    dashboard: USE_MOCK_API,
   },
 };
 

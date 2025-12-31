@@ -1,13 +1,27 @@
 /**
  * Room Types
+ * Type definitions for the Rooms Management feature
  */
 
+// Room status types
+export type RoomStatus = 'vacant' | 'occupied' | 'maintenance';
+export type PaymentStatus = 'paid' | 'unpaid' | 'overdue';
+
+// Current tenant information
+export interface CurrentTenant {
+  id: string;
+  name: string;
+  phone: string;
+  moveInDate: string;
+}
+
+// Room entity
 export interface Room {
   id: string;
   propertyId: string;
   roomCode: string;
   roomName: string;
-  status: 'vacant' | 'occupied' | 'maintenance';
+  status: RoomStatus;
 
   // Pricing
   rentalPrice: number;
@@ -17,13 +31,17 @@ export interface Room {
   parkingFee: number;
 
   // Current tenant
-  currentTenantId?: string;
+  currentTenant?: CurrentTenant;
+
+  // Payment info
+  paymentStatus?: PaymentStatus;
 
   // Metadata
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
+// Form Data Types
 export interface CreateRoomDto {
   propertyId: string;
   roomCode: string;
@@ -36,9 +54,7 @@ export interface CreateRoomDto {
 }
 
 export interface UpdateRoomDto {
-  roomCode?: string;
   roomName?: string;
-  status?: 'vacant' | 'occupied' | 'maintenance';
   rentalPrice?: number;
   electricityFee?: number;
   waterFee?: number;
@@ -46,19 +62,37 @@ export interface UpdateRoomDto {
   parkingFee?: number;
 }
 
+// Filter Types
 export interface RoomFilters {
   propertyId?: string;
-  status?: 'vacant' | 'occupied' | 'maintenance';
-  search?: string;
-  paymentStatus?: 'paid' | 'unpaid';
+  status?: RoomStatus[];
+  paymentStatus?: PaymentStatus[];
+  searchQuery?: string;
   minPrice?: number;
   maxPrice?: number;
 }
 
-export interface RoomWithTenant extends Room {
-  tenant?: {
-    id: string;
-    name: string;
-    phone: string;
-  };
+// API Response Types
+export interface RoomsResponse {
+  data: Room[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface RoomResponse {
+  data: Room;
+}
+
+// Payment record for room detail screen
+export interface PaymentRecord {
+  id: string;
+  date: string;
+  amount: number;
+  status: PaymentStatus;
+}
+
+// Extended room with payment history
+export interface RoomWithPayments extends Room {
+  paymentHistory?: PaymentRecord[];
 }

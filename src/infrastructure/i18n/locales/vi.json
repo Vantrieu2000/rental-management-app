@@ -1,5 +1,6 @@
 {
   "common": {
+    "appName": "Quản Lý Cho Thuê",
     "save": "Lưu",
     "cancel": "Hủy",
     "delete": "Xóa",
@@ -13,27 +14,48 @@
     "confirm": "Xác nhận",
     "back": "Quay lại",
     "next": "Tiếp theo",
+    "submit": "Gửi",
+    "close": "Đóng",
     "done": "Hoàn thành",
     "yes": "Có",
-    "no": "Không"
+    "no": "Không",
+    "ok": "OK",
+    "retry": "Thử lại",
+    "apply": "Áp dụng",
+    "clear": "Xóa",
+    "month": "tháng"
   },
   "navigation": {
     "dashboard": "Tổng quan",
     "rooms": "Phòng trọ",
     "payments": "Thanh toán",
     "notifications": "Thông báo",
+    "reports": "Báo cáo",
     "settings": "Cài đặt"
   },
+  "dashboard": {
+    "title": "Tổng quan",
+    "addRoom": "Thêm phòng",
+    "recordPayment": "Ghi thanh toán",
+    "addTenant": "Thêm người thuê",
+    "reports": "Báo cáo",
+    "totalRooms": "Tổng số phòng",
+    "occupiedRooms": "Phòng đã thuê",
+    "unpaidRooms": "Phòng chưa thanh toán",
+    "totalRevenue": "Tổng doanh thu",
+    "revenueTrends": "Xu hướng doanh thu",
+    "occupancyRate": "Tỷ lệ lấp đầy",
+    "recentActivity": "Hoạt động gần đây",
+    "noRecentActivity": "Không có hoạt động gần đây",
+    "overduePayments": "Thanh toán quá hạn"
+  },
   "auth": {
-    "login": {
-      "title": "Chào mừng trở lại",
-      "subtitle": "Đăng nhập để tiếp tục",
-      "email": "Email",
-      "password": "Mật khẩu",
-      "submit": "Đăng nhập",
-      "biometric": "Đăng nhập bằng sinh trắc học",
-      "or": "HOẶC"
-    },
+    "signIn": "Đăng nhập",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "login": "Đăng nhập",
+    "loginFailed": "Email hoặc mật khẩu không đúng",
+    "connectedTo": "Kết nối đến",
     "logout": "Đăng xuất",
     "errors": {
       "emailRequired": "Email là bắt buộc",
@@ -53,24 +75,92 @@
     }
   },
   "rooms": {
-    "title": "Phòng trọ",
-    "addRoom": "Thêm phòng",
-    "editRoom": "Sửa phòng",
-    "roomCode": "Mã phòng",
-    "roomName": "Tên phòng",
-    "status": "Trạng thái",
-    "vacant": "Trống",
-    "occupied": "Đã thuê",
-    "maintenance": "Bảo trì",
-    "rentalPrice": "Giá thuê",
-    "electricityFee": "Tiền điện",
-    "waterFee": "Tiền nước",
-    "garbageFee": "Tiền rác",
-    "parkingFee": "Tiền gửi xe",
+    "title": "Phòng",
+    "searchPlaceholder": "Tìm theo mã phòng, tên, hoặc người thuê",
+    "addRoom": "Thêm Phòng",
+    "editRoom": "Sửa Phòng",
+    "deleteRoom": "Xóa Phòng",
+    "roomsFound": "Tìm thấy {{count}} phòng",
+    "roomList": "Danh Sách Phòng",
+    "roomDetails": "Chi Tiết Phòng",
+    "roomNumber": "Số Phòng",
+    "roomCode": "Mã Phòng",
+    "roomName": "Tên Phòng",
+    "floor": "Tầng",
+    "area": "Diện tích",
+    "price": "Giá",
+    "rentalPrice": "Giá Thuê",
+    "electricityFee": "Tiền Điện",
+    "waterFee": "Tiền Nước",
+    "garbageFee": "Tiền Rác",
+    "parkingFee": "Tiền Gửi Xe",
     "totalFee": "Tổng tiền",
+    "status": {
+      "label": "Trạng thái",
+      "vacant": "Trống",
+      "occupied": "Đã thuê",
+      "maintenance": "Bảo trì"
+    },
+    "paymentStatus": {
+      "label": "Trạng thái thanh toán",
+      "paid": "Đã thanh toán",
+      "unpaid": "Chưa thanh toán",
+      "overdue": "Quá hạn"
+    },
+    "tenant": {
+      "label": "Người thuê",
+      "name": "Tên người thuê",
+      "phone": "Số điện thoại",
+      "moveInDate": "Ngày vào ở",
+      "noTenant": "Chưa có người thuê"
+    },
+    "form": {
+      "roomCode": "Mã Phòng",
+      "roomName": "Tên Phòng",
+      "rentalPrice": "Giá Thuê",
+      "electricityFee": "Tiền Điện",
+      "waterFee": "Tiền Nước",
+      "garbageFee": "Tiền Rác",
+      "parkingFee": "Tiền Gửi Xe",
+      "minPrice": "Giá tối thiểu",
+      "maxPrice": "Giá tối đa",
+      "submit": "Xác Nhận",
+      "cancel": "Hủy",
+      "roomCodeReadOnly": "Mã phòng không thể thay đổi"
+    },
+    "errors": {
+      "loadFailed": "Không thể tải danh sách phòng",
+      "createFailed": "Không thể tạo phòng",
+      "updateFailed": "Không thể cập nhật phòng",
+      "deleteFailed": "Không thể xóa phòng",
+      "duplicateCode": "Mã phòng đã tồn tại",
+      "networkError": "Không có kết nối internet. Vui lòng kiểm tra mạng.",
+      "serverError": "Lỗi máy chủ. Vui lòng thử lại sau.",
+      "roomNotFound": "Không tìm thấy phòng.",
+      "invalidRequest": "Yêu cầu không hợp lệ. Vui lòng kiểm tra thông tin.",
+      "cannotDeleteWithPayments": "Không thể xóa phòng có lịch sử thanh toán."
+    },
+    "success": {
+      "created": "Tạo phòng thành công",
+      "updated": "Cập nhật phòng thành công",
+      "deleted": "Xóa phòng thành công"
+    },
+    "confirmDelete": {
+      "title": "Xóa Phòng",
+      "message": "Bạn có chắc chắn muốn xóa phòng này? Hành động này không thể hoàn tác.",
+      "confirm": "Xóa",
+      "cancel": "Hủy"
+    },
     "currentTenant": "Người thuê hiện tại",
     "noRooms": "Không tìm thấy phòng",
-    "deleteConfirm": "Bạn có chắc chắn muốn xóa phòng này?"
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa phòng này?",
+    "adjustFilters": "Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm",
+    "priceRange": "Khoảng giá",
+    "noProperties": {
+      "title": "Chưa có thông tin khu trọ",
+      "message": "Bạn cần tạo thông tin khu trọ trước khi thêm phòng. Bạn có muốn chuyển đến màn hình Cài đặt để tạo khu trọ không?",
+      "goToSettings": "Đến Cài đặt"
+    }
   },
   "tenants": {
     "title": "Người thuê",
@@ -123,11 +213,98 @@
   "properties": {
     "title": "Bất động sản",
     "addProperty": "Thêm bất động sản",
+    "editProperty": "Sửa bất động sản",
+    "deleteProperty": "Xóa bất động sản",
     "propertyName": "Tên bất động sản",
     "address": "Địa chỉ",
     "totalRooms": "Tổng số phòng",
+    "occupiedRooms": "Đã thuê",
+    "vacantRooms": "Trống",
     "selectProperty": "Chọn bất động sản",
-    "defaultRates": "Giá mặc định"
+    "defaultRates": "Giá mặc định",
+    "noProperties": "Chưa có bất động sản",
+    "addFirstProperty": "Thêm bất động sản đầu tiên để bắt đầu",
+    
+    "types": {
+      "apartment": "Chung cư",
+      "dormitory": "Khu trọ",
+      "house": "Nhà riêng",
+      "commercial": "Thương mại"
+    },
+    
+    "form": {
+      "name": "Tên bất động sản",
+      "namePlaceholder": "Nhập tên bất động sản",
+      "address": "Địa chỉ",
+      "addressPlaceholder": "Nhập địa chỉ",
+      "type": "Loại bất động sản",
+      "typePlaceholder": "Chọn loại bất động sản",
+      "totalRooms": "Tổng số phòng",
+      "totalRoomsPlaceholder": "Nhập số lượng phòng",
+      "defaultRates": "Giá mặc định",
+      "defaultElectricityRate": "Giá điện mặc định",
+      "defaultWaterRate": "Giá nước mặc định",
+      "defaultGarbageRate": "Phí rác mặc định",
+      "defaultParkingRate": "Phí gửi xe mặc định",
+      "billingSettings": "Cài đặt thanh toán",
+      "billingDayOfMonth": "Ngày thanh toán hàng tháng",
+      "billingDayHelper": "Ngày trong tháng để tính tiền (1-31)",
+      "reminderDaysBefore": "Nhắc nhở trước (ngày)",
+      "reminderDaysHelper": "Số ngày nhắc nhở trước hạn thanh toán (0-30)",
+      "submit": "Lưu bất động sản",
+      "cancel": "Hủy"
+    },
+    
+    "statistics": {
+      "totalProperties": "Tổng số bất động sản",
+      "totalRooms": "Tổng số phòng",
+      "occupancyRate": "Tỷ lệ lấp đầy"
+    },
+    
+    "confirmDelete": {
+      "title": "Xóa bất động sản",
+      "message": "Bạn có chắc chắn muốn xóa bất động sản này?",
+      "messageWithRooms": "Bất động sản này có {{count}} phòng. Xóa nó sẽ xóa tất cả phòng và dữ liệu liên quan. Hành động này không thể hoàn tác.",
+      "confirm": "Xóa",
+      "cancel": "Hủy"
+    },
+    
+    "success": {
+      "created": "Tạo bất động sản thành công",
+      "updated": "Cập nhật bất động sản thành công",
+      "deleted": "Xóa bất động sản thành công"
+    },
+    
+    "errors": {
+      "loadFailed": "Không thể tải danh sách bất động sản",
+      "createFailed": "Không thể tạo bất động sản",
+      "updateFailed": "Không thể cập nhật bất động sản",
+      "deleteFailed": "Không thể xóa bất động sản",
+      "notFound": "Không tìm thấy bất động sản",
+      "validationError": "Vui lòng kiểm tra thông tin nhập vào",
+      "networkError": "Không có kết nối internet",
+      "serverError": "Lỗi máy chủ. Vui lòng thử lại sau",
+      "cannotDeleteWithRooms": "Không thể xóa bất động sản có phòng",
+      "formHasErrors": "Vui lòng sửa lỗi trước khi gửi"
+    },
+    
+    "validation": {
+      "nameRequired": "Tên bất động sản là bắt buộc",
+      "nameMaxLength": "Tên bất động sản tối đa 100 ký tự",
+      "addressRequired": "Địa chỉ là bắt buộc",
+      "addressMaxLength": "Địa chỉ tối đa 200 ký tự",
+      "typeRequired": "Loại bất động sản là bắt buộc",
+      "totalRoomsRequired": "Tổng số phòng là bắt buộc",
+      "totalRoomsPositive": "Tổng số phòng phải là số dương",
+      "totalRoomsInteger": "Tổng số phòng phải là số nguyên",
+      "rateNonNegative": "Giá phải là số không âm",
+      "billingDayInteger": "Ngày thanh toán phải là số nguyên",
+      "billingDayMin": "Ngày thanh toán phải từ 1-31",
+      "billingDayMax": "Ngày thanh toán phải từ 1-31",
+      "reminderDaysInteger": "Số ngày nhắc nhở phải là số nguyên",
+      "reminderDaysMin": "Số ngày nhắc nhở phải từ 0-30",
+      "reminderDaysMax": "Số ngày nhắc nhở phải từ 0-30"
+    }
   },
   "maintenance": {
     "title": "Bảo trì",
@@ -169,6 +346,7 @@
     "dark": "Tối",
     "system": "Hệ thống",
     "notifications": "Thông báo",
+    "security" : "Bảo mật",
     "about": "Giới thiệu",
     "version": "Phiên bản",
     "logout": "Đăng xuất"

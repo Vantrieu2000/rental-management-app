@@ -36,6 +36,17 @@ jest.mock('expo-notifications', () => ({
   getAllScheduledNotificationsAsync: jest.fn().mockResolvedValue([]),
 }));
 
+jest.mock('expo-constants', () => ({
+  default: {
+    expoConfig: {
+      extra: {
+        apiUrl: 'http://localhost:3000/api',
+        apiTimeout: 30000,
+      },
+    },
+  },
+}));
+
 // Mock NetInfo
 jest.mock('@react-native-community/netinfo', () => ({
   fetch: jest.fn(() =>

@@ -1,0 +1,200 @@
+{
+  "common": {
+    "appName": "Rental Management",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "retry": "Retry",
+    "apply": "Apply",
+    "clear": "Clear",
+    "month": "month"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "signIn": "Sign in to continue",
+    "loginFailed": "Login failed. Please try again.",
+    "invalidCredentials": "Invalid email or password",
+    "connectedTo": "Connected to"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome",
+    "overview": "Overview",
+    "statistics": "Statistics",
+    "recentActivity": "Recent Activity"
+  },
+  "properties": {
+    "title": "Properties",
+    "addProperty": "Add Property",
+    "editProperty": "Edit Property",
+    "propertyList": "Property List",
+    "propertyDetails": "Property Details",
+    "name": "Name",
+    "address": "Address",
+    "type": "Type",
+    "status": "Status",
+    "rooms": "Rooms",
+    "noProperties": "No properties yet"
+  },
+  "rooms": {
+    "title": "Rooms",
+    "searchPlaceholder": "Search by room code, name, or tenant",
+    "addRoom": "Add Room",
+    "editRoom": "Edit Room",
+    "deleteRoom": "Delete Room",
+    "roomsFound": "{{count}} rooms found",
+    "roomList": "Room List",
+    "roomDetails": "Room Details",
+    "roomNumber": "Room Number",
+    "roomCode": "Room Code",
+    "roomName": "Room Name",
+    "floor": "Floor",
+    "area": "Area",
+    "price": "Price",
+    "rentalPrice": "Rental Price",
+    "electricityFee": "Electricity Fee",
+    "waterFee": "Water Fee",
+    "garbageFee": "Garbage Fee",
+    "parkingFee": "Parking Fee",
+    "status": {
+      "label": "Status",
+      "vacant": "Vacant",
+      "occupied": "Occupied",
+      "maintenance": "Maintenance"
+    },
+    "paymentStatus": {
+      "label": "Payment Status",
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "overdue": "Overdue"
+    },
+    "tenant": {
+      "label": "Tenant",
+      "name": "Tenant Name",
+      "phone": "Phone",
+      "moveInDate": "Move-in Date",
+      "noTenant": "No tenant"
+    },
+    "form": {
+      "roomCode": "Room Code",
+      "roomName": "Room Name",
+      "rentalPrice": "Rental Price",
+      "electricityFee": "Electricity Fee",
+      "waterFee": "Water Fee",
+      "garbageFee": "Garbage Fee",
+      "parkingFee": "Parking Fee",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "roomCodeReadOnly": "Room code cannot be changed"
+    },
+    "errors": {
+      "loadFailed": "Failed to load rooms",
+      "createFailed": "Failed to create room",
+      "updateFailed": "Failed to update room",
+      "deleteFailed": "Failed to delete room",
+      "duplicateCode": "Room code already exists",
+      "networkError": "No internet connection. Please check your network.",
+      "serverError": "Server error. Please try again later.",
+      "roomNotFound": "Room not found.",
+      "invalidRequest": "Invalid request. Please check your input.",
+      "cannotDeleteWithPayments": "Cannot delete room with active payment records."
+    },
+    "success": {
+      "created": "Room created successfully",
+      "updated": "Room updated successfully",
+      "deleted": "Room deleted successfully"
+    },
+    "confirmDelete": {
+      "title": "Delete Room",
+      "message": "Are you sure you want to delete this room? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "available": "Available",
+    "noRooms": "No rooms yet"
+  },
+  "tenants": {
+    "title": "Tenants",
+    "addTenant": "Add Tenant",
+    "editTenant": "Edit Tenant",
+    "tenantList": "Tenant List",
+    "tenantDetails": "Tenant Details",
+    "assignTenant": "Assign Tenant",
+    "name": "Name",
+    "phone": "Phone",
+    "email": "Email",
+    "idNumber": "ID Number",
+    "moveInDate": "Move In Date",
+    "moveOutDate": "Move Out Date",
+    "noTenants": "No tenants yet"
+  },
+  "payments": {
+    "title": "Payments",
+    "addPayment": "Add Payment",
+    "paymentHistory": "Payment History",
+    "paymentDetails": "Payment Details",
+    "amount": "Amount",
+    "date": "Date",
+    "method": "Method",
+    "status": "Status",
+    "paid": "Paid",
+    "pending": "Pending",
+    "overdue": "Overdue",
+    "noPayments": "No payments yet"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAsRead": "Mark as Read",
+    "markAllAsRead": "Mark All as Read",
+    "noNotifications": "No new notifications"
+  },
+  "reminders": {
+    "title": "Reminders",
+    "addReminder": "Add Reminder",
+    "editReminder": "Edit Reminder",
+    "reminderList": "Reminder List",
+    "dueDate": "Due Date",
+    "description": "Description",
+    "noReminders": "No reminders yet"
+  },
+  "reports": {
+    "title": "Reports",
+    "dashboard": "Dashboard",
+    "revenue": "Revenue",
+    "expenses": "Expenses",
+    "occupancy": "Occupancy Rate",
+    "generate": "Generate Report"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "notifications": "Notifications",
+    "security": "Security",
+    "about": "About",
+    "version": "Version",
+    "logout": "Logout",
+    "changeLanguage": "Change Language",
+    "languageChanged": "Language changed successfully"
+  }
+}

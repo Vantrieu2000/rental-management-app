@@ -4,8 +4,9 @@
  */
 
 import React from 'react';
-import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import type { MainTabParamList } from '@/shared/types/navigation';
 
 // Stack Navigators
@@ -22,6 +23,8 @@ import { useNotificationSummary } from '@/features/notifications/hooks/useNotifi
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabs() {
+  const { t } = useTranslation();
+  
   // Get notification count for badge
   const { data: notificationSummary } = useNotificationSummary();
   const notificationCount = notificationSummary
@@ -38,12 +41,12 @@ export default function MainTabs() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E0E0E0',
-          height: 75,
+          height: 'auto',
           paddingBottom: 8,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
         },
       }}
@@ -52,10 +55,9 @@ export default function MainTabs() {
         name="DashboardTab"
         component={DashboardStack}
         options={{
-          tabBarLabel: 'Dashboard',
+          tabBarLabel: t('dashboard.title', 'Dashboard'),
           tabBarIcon: ({ color, size }) => (
-            // Placeholder - will be replaced with actual icons
-            <TabIcon name="dashboard" color={color} size={size} />
+            <MaterialCommunityIcons name="view-dashboard" size={size} color={color} />
           ),
         }}
       />
@@ -63,9 +65,9 @@ export default function MainTabs() {
         name="RoomsTab"
         component={RoomsStack}
         options={{
-          tabBarLabel: 'Rooms',
+          tabBarLabel: t('rooms.title', 'Rooms'),
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="rooms" color={color} size={size} />
+            <MaterialCommunityIcons name="home-group" size={size} color={color} />
           ),
         }}
       />
@@ -73,9 +75,9 @@ export default function MainTabs() {
         name="PaymentsTab"
         component={PaymentsStack}
         options={{
-          tabBarLabel: 'Payments',
+          tabBarLabel: t('payments.title', 'Payments'),
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="payments" color={color} size={size} />
+            <MaterialCommunityIcons name="cash-multiple" size={size} color={color} />
           ),
         }}
       />
@@ -83,16 +85,19 @@ export default function MainTabs() {
         name="NotificationsTab"
         component={NotificationsStack}
         options={{
-          tabBarLabel: 'Notifications',
+          tabBarLabel: t('notifications.title', 'Notifications'),
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="notifications" color={color} size={size} />
+            <MaterialCommunityIcons name="bell" size={size} color={color} />
           ),
           tabBarBadge: notificationCount > 0 ? notificationCount : undefined,
           tabBarBadgeStyle: {
-            backgroundColor: '#D32F2F',
+            backgroundColor: '#F44336',
             color: '#FFFFFF',
             fontSize: 10,
             fontWeight: '700',
+            minWidth: 18,
+            height: 18,
+            borderRadius: 9,
           },
         }}
       />
@@ -100,9 +105,9 @@ export default function MainTabs() {
         name="ReportsTab"
         component={ReportsStack}
         options={{
-          tabBarLabel: 'Reports',
+          tabBarLabel: t('reports.title', 'Reports'),
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="reports" color={color} size={size} />
+            <MaterialCommunityIcons name="file-chart" size={size} color={color} />
           ),
         }}
       />
@@ -110,27 +115,12 @@ export default function MainTabs() {
         name="SettingsTab"
         component={SettingsStack}
         options={{
-          tabBarLabel: 'Settings',
+          tabBarLabel: t('settings.title', 'Settings'),
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="settings" color={color} size={size} />
+            <MaterialCommunityIcons name="cog" size={size} color={color} />
           ),
         }}
       />
     </Tab.Navigator>
-  );
-}
-
-// Placeholder Tab Icon Component
-// Will be replaced with actual icon library (e.g., @expo/vector-icons)
-function TabIcon({ name, color, size }: { name: string; color: string; size: number }) {
-  return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: color,
-        borderRadius: size / 2,
-      }}
-    />
   );
 }

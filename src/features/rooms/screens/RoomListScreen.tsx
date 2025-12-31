@@ -4,111 +4,63 @@
  */
 
 import React, { useState } from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import {
   Searchbar,
   FAB,
   Chip,
   Text,
-  ActivityIndicator,
+  Button,
   Portal,
   Modal,
 } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 import type { RoomsStackScreenProps } from '@/shared/types/navigation';
-import { useSearch } from '@/shared/hooks/useSearch';
-import HighlightedText from '@/shared/components/HighlightedText';
+import { useRooms } from '../hooks/useRooms';
+import { useDebounce } from '../hooks/useDebounce';
+import { RoomCardSkeleton } from '../components/RoomCardSkeleton';
 import FilterSheet from '@/features/rooms/components/FilterSheet';
-import type { RoomWithTenant } from '@/features/rooms/types';
+import type { Room, RoomFilters } from '@/features/rooms/types';
 
 type Props = RoomsStackScreenProps<'RoomList'>;
 
-// Mock data for demonstration
-const MOCK_ROOMS: RoomWithTenant[] = [
-  {
-    id: '1',
-    propertyId: 'prop1',
-    roomCode: 'A101',
-    roomName: 'Room A101',
-    status: 'occupied',
-    rentalPrice: 3000000,
-    electricityFee: 200000,
-    waterFee: 100000,
-    garbageFee: 50000,
-    parkingFee: 150000,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    tenant: {
-      id: 't1',
-      name: 'Nguyen Van A',
-      phone: '0901234567',
-    },
-  },
-  {
-    id: '2',
-    propertyId: 'prop1',
-    roomCode: 'A102',
-    roomName: 'Room A102',
-    status: 'vacant',
-    rentalPrice: 3500000,
-    electricityFee: 200000,
-    waterFee: 100000,
-    garbageFee: 50000,
-    parkingFee: 150000,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '3',
-    propertyId: 'prop1',
-    roomCode: 'B201',
-    roomName: 'Room B201',
-    status: 'occupied',
-    rentalPrice: 4000000,
-    electricityFee: 250000,
-    waterFee: 120000,
-    garbageFee: 50000,
-    parkingFee: 200000,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    tenant: {
-      id: 't2',
-      name: 'Tran Thi B',
-      phone: '0907654321',
-    },
-  },
-];
-
 export default function RoomListScreen({ navigation }: Props) {
+  const { t } = useTranslation();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState<RoomFilters>({});
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const {
-    searchQuery,
-    setSearchQuery,
-    filters,
-    updateFilters,
-    clearFilters,
-    filteredRooms,
-    hasActiveFilters,
-    isSearching,
-  } = useSearch(MOCK_ROOMS, {
-    debounceDelay: 300,
-    maxResults: 1000,
-  });
+  // Debounce search query to reduce API calls
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  const renderRoomCard = ({ item }: { item: RoomWithTenant }) => (
+  // Combine debounced search query with filters
+  const activeFilters: RoomFilters = {
+    ...filters,
+    searchQuery: debouncedSearchQuery || undefined,
+  };
+
+  const { data, isLoading, isError, error, refetch } = useRooms(activeFilters);
+
+  const handleApplyFilters = (newFilters: RoomFilters) => {
+    setFilters(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({});
+  };
+
+  const hasActiveFilters =
+    (filters.status && filters.status.length > 0) ||
+    (filters.paymentStatus && filters.paymentStatus.length > 0) ||
+    filters.minPrice !== undefined ||
+    filters.maxPrice !== undefined;
+
+  const renderRoomCard = ({ item }: { item: Room }) => (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
         <View>
-          <HighlightedText
-            text={item.roomCode}
-            query={searchQuery}
-            style={styles.roomCode}
-          />
-          <HighlightedText
-            text={item.roomName}
-            query={searchQuery}
-            style={styles.roomName}
-          />
+          <Text style={styles.roomCode}>{item.roomCode}</Text>
+          <Text style={styles.roomName}>{item.roomName}</Text>
         </View>
         <Chip
           mode="flat"
@@ -119,20 +71,16 @@ export default function RoomListScreen({ navigation }: Props) {
             item.status === 'maintenance' && styles.maintenanceChip,
           ]}
         >
-          {item.status}
+          {t(`rooms.status.${item.status}`)}
         </Chip>
       </View>
 
-      {item.tenant && (
+      {item.currentTenant && (
         <View style={styles.tenantInfo}>
           <Text variant="bodySmall" style={styles.label}>
-            Tenant:
+            {t('rooms.tenant.label')}:
           </Text>
-          <HighlightedText
-            text={item.tenant.name}
-            query={searchQuery}
-            style={styles.tenantName}
-          />
+          <Text style={styles.tenantName}>{item.currentTenant.name}</Text>
         </View>
       )}
 
@@ -146,57 +94,112 @@ export default function RoomListScreen({ navigation }: Props) {
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Text variant="titleMedium">No rooms found</Text>
+      <Text variant="titleMedium">{t('rooms.noRooms')}</Text>
       {hasActiveFilters && (
         <Text variant="bodyMedium" style={styles.emptySubtext}>
-          Try adjusting your filters or search query
+          {t('rooms.adjustFilters')}
         </Text>
       )}
     </View>
   );
 
+  const renderSkeletonLoader = () => (
+    <View>
+      {[1, 2, 3, 4, 5].map((key) => (
+        <RoomCardSkeleton key={key} />
+      ))}
+    </View>
+  );
+
+  const renderErrorState = () => (
+    <View style={styles.errorState}>
+      <Text variant="titleMedium">{t('rooms.errors.loadFailed')}</Text>
+      <Text variant="bodyMedium" style={styles.errorMessage}>
+        {error?.message}
+      </Text>
+      <Button mode="contained" onPress={() => refetch()} style={styles.retryButton}>
+        {t('common.retry')}
+      </Button>
+    </View>
+  );
+
+  // Show loading skeleton on initial load
+  if (isLoading && !data) {
+    return (
+      <View style={styles.container}>
+        <Searchbar
+          placeholder={t('rooms.searchPlaceholder')}
+          onChangeText={setSearchQuery}
+          value={searchQuery}
+          style={styles.searchBar}
+          editable={false}
+        />
+        {renderSkeletonLoader()}
+      </View>
+    );
+  }
+
+  // Show error state
+  if (isError) {
+    return (
+      <View style={styles.container}>
+        {renderErrorState()}
+      </View>
+    );
+  }
+
+  const rooms = data?.data || [];
+  const roomCount = data?.total || 0;
+
   return (
     <View style={styles.container}>
       {/* Search Bar */}
       <Searchbar
-        placeholder="Search by room code, name, or tenant"
+        placeholder={t('rooms.searchPlaceholder')}
         onChangeText={setSearchQuery}
         value={searchQuery}
         style={styles.searchBar}
-        loading={isSearching}
       />
 
       {/* Active Filters */}
       {hasActiveFilters && (
         <View style={styles.filterChips}>
-          {filters.status && (
+          {filters.status?.map((status) => (
             <Chip
-              onClose={() => updateFilters({ status: undefined })}
+              key={status}
+              onClose={() => {
+                const newStatus = filters.status?.filter((s) => s !== status);
+                handleApplyFilters({ ...filters, status: newStatus?.length ? newStatus : undefined });
+              }}
               style={styles.filterChip}
             >
-              Status: {filters.status}
+              {t(`rooms.status.${status}`)}
             </Chip>
-          )}
-          {filters.paymentStatus && (
+          ))}
+          {filters.paymentStatus?.map((status) => (
             <Chip
-              onClose={() => updateFilters({ paymentStatus: undefined })}
+              key={status}
+              onClose={() => {
+                const newPaymentStatus = filters.paymentStatus?.filter((s) => s !== status);
+                handleApplyFilters({ ...filters, paymentStatus: newPaymentStatus?.length ? newPaymentStatus : undefined });
+              }}
               style={styles.filterChip}
             >
-              Payment: {filters.paymentStatus}
+              {t(`rooms.paymentStatus.${status}`)}
             </Chip>
-          )}
+          ))}
           {(filters.minPrice !== undefined || filters.maxPrice !== undefined) && (
             <Chip
               onClose={() =>
-                updateFilters({ minPrice: undefined, maxPrice: undefined })
+                handleApplyFilters({ ...filters, minPrice: undefined, maxPrice: undefined })
               }
               style={styles.filterChip}
             >
-              Price Range
+              {t('rooms.priceRange')}
             </Chip>
           )}
-          <Chip onPress={clearFilters} style={styles.clearChip}>
-            Clear All
+          <Chip onPress={handleClearFilters} style={styles.clearChip}>
+            {t('common.clear')}
           </Chip>
         </View>
       )}
@@ -204,24 +207,27 @@ export default function RoomListScreen({ navigation }: Props) {
       {/* Results Count */}
       <View style={styles.resultsHeader}>
         <Text variant="bodyMedium">
-          {filteredRooms.length} room{filteredRooms.length !== 1 ? 's' : ''} found
+          {t('rooms.roomsFound', { count: roomCount })}
         </Text>
       </View>
 
       {/* Room List */}
       <FlatList
-        data={filteredRooms}
+        data={rooms}
         renderItem={renderRoomCard}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={renderEmptyState}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+        }
       />
 
       {/* Filter FAB */}
       <FAB
         icon="filter-variant"
-        label="Filter"
+        label={t('common.filter')}
         onPress={() => setFilterVisible(true)}
         style={styles.filterFab}
       />
@@ -242,7 +248,10 @@ export default function RoomListScreen({ navigation }: Props) {
         >
           <FilterSheet
             filters={filters}
-            onApplyFilters={updateFilters}
+            onApplyFilters={(newFilters) => {
+              handleApplyFilters(newFilters);
+              setFilterVisible(false);
+            }}
             onClose={() => setFilterVisible(false)}
           />
         </Modal>
@@ -351,6 +360,21 @@ const styles = StyleSheet.create({
   emptySubtext: {
     marginTop: 8,
     color: '#666',
+  },
+  errorState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  errorMessage: {
+    marginTop: 8,
+    marginBottom: 16,
+    textAlign: 'center',
+    opacity: 0.6,
+  },
+  retryButton: {
+    marginTop: 8,
   },
   filterFab: {
     position: 'absolute',

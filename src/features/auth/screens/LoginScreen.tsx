@@ -1,51 +1,63 @@
 /**
  * Login Screen
- * Simple login implementation for testing
+ * Integrated with real backend API and i18n
  */
 
 import React, { useState } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, Button, Text, Card } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/auth.store';
+import { authApi } from '../services/authApi';
 import type { AuthStackScreenProps } from '@/shared/types/navigation';
 
 type Props = AuthStackScreenProps<'Login'>;
 
 export default function LoginScreen({ navigation }: Props) {
-  const [email, setEmail] = useState('demo@example.com');
-  const [password, setPassword] = useState('password');
+  const { t } = useTranslation();
+  const [email, setEmail] = useState('admin@gmail.com');
+  const [password, setPassword] = useState('password123');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   
   const { login } = useAuthStore();
 
   const handleLogin = async () => {
     try {
       setLoading(true);
+      setError('');
       
-      // Mock login - in real app, this would call an API
-      const mockUser = {
-        id: '1',
-        email: email,
-        name: 'Demo User',
-        role: 'owner' as const,
-        language: 'en' as const,
-        currency: 'VND' as const,
-        timezone: 'Asia/Ho_Chi_Minh',
-        biometricEnabled: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      // Call real backend API
+      const response = await authApi.login({ email, password });
+      
+      // Map backend response to frontend format
+      const user = {
+        id: response.user._id,
+        _id: response.user._id,
+        email: response.user.email,
+        name: response.user.name,
+        phone: response.user.phone,
+        role: response.user.role,
+        language: response.user.language,
+        currency: response.user.currency,
+        timezone: response.user.timezone,
+        biometricEnabled: response.user.biometricEnabled,
+        lastLoginAt: response.user.lastLoginAt,
+        createdAt: response.user.createdAt,
+        updatedAt: response.user.updatedAt,
       };
 
-      const mockTokens = {
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-refresh-token',
+      const tokens = {
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
       };
 
-      await login(mockUser, mockTokens);
+      await login(user, tokens);
       
       // Navigation will happen automatically via RootNavigator
     } catch (error) {
       console.error('Login failed:', error);
+      setError(error instanceof Error ? error.message : t('auth.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -60,29 +72,37 @@ export default function LoginScreen({ navigation }: Props) {
         <Card style={styles.card}>
           <Card.Content>
             <Text variant="headlineMedium" style={styles.title}>
-              Rental Management
+              {t('common.appName', 'Quản Lý Cho Thuê')}
             </Text>
             <Text variant="bodyMedium" style={styles.subtitle}>
-              Sign in to continue
+              {t('auth.signIn')}
             </Text>
 
+            {error ? (
+              <Text variant="bodyMedium" style={styles.error}>
+                {error}
+              </Text>
+            ) : null}
+
             <TextInput
-              label="Email"
+              label={t('auth.email')}
               value={email}
               onChangeText={setEmail}
               mode="outlined"
               keyboardType="email-address"
               autoCapitalize="none"
               style={styles.input}
+              disabled={loading}
             />
 
             <TextInput
-              label="Password"
+              label={t('auth.password')}
               value={password}
               onChangeText={setPassword}
               mode="outlined"
               secureTextEntry
               style={styles.input}
+              disabled={loading}
             />
 
             <Button
@@ -92,12 +112,8 @@ export default function LoginScreen({ navigation }: Props) {
               disabled={loading}
               style={styles.button}
             >
-              Login
+              {t('auth.login')}
             </Button>
-
-            <Text variant="bodySmall" style={styles.hint}>
-              Demo credentials are pre-filled
-            </Text>
           </Card.Content>
         </Card>
       </View>
@@ -129,6 +145,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
     color: '#666',
+  },
+  error: {
+    textAlign: 'center',
+    marginBottom: 16,
+    color: '#f44336',
+    backgroundColor: '#ffebee',
+    padding: 12,
+    borderRadius: 4,
   },
   input: {
     marginBottom: 16,

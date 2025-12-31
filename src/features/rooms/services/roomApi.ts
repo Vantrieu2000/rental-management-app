@@ -4,7 +4,14 @@
  */
 
 import { env } from '@/shared/config/env';
-import { Room, CreateRoomDto, UpdateRoomDto, RoomFilters, RoomWithTenant } from '../types';
+import {
+  Room,
+  CreateRoomDto,
+  UpdateRoomDto,
+  RoomFilters,
+  RoomsResponse,
+  RoomResponse,
+} from '../types';
 
 class RoomApiClient {
   private baseUrl: string;
@@ -15,18 +22,41 @@ class RoomApiClient {
     this.timeout = env.apiTimeout;
   }
 
-  async getRooms(accessToken: string, filters?: RoomFilters): Promise<Room[]> {
+  async getRooms(accessToken: string, filters?: RoomFilters): Promise<RoomsResponse> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
     try {
       const queryParams = new URLSearchParams();
-      if (filters?.propertyId) queryParams.append('propertyId', filters.propertyId);
-      if (filters?.status) queryParams.append('status', filters.status);
-      if (filters?.search) queryParams.append('search', filters.search);
-      if (filters?.paymentStatus) queryParams.append('paymentStatus', filters.paymentStatus);
-      if (filters?.minPrice) queryParams.append('minPrice', filters.minPrice.toString());
-      if (filters?.maxPrice) queryParams.append('maxPrice', filters.maxPrice.toString());
+      
+      // Property filter
+      if (filters?.propertyId) {
+        queryParams.append('propertyId', filters.propertyId);
+      }
+      
+      // Status filter
+      if (filters?.status && filters.status.length > 0) {
+        filters.status.forEach((s) => queryParams.append('status', s));
+      }
+      
+      // Payment status filter (if backend supports it)
+      if (filters?.paymentStatus && filters.paymentStatus.length > 0) {
+        filters.paymentStatus.forEach((ps) => queryParams.append('paymentStatus', ps));
+      }
+      
+      // Search query
+      if (filters?.searchQuery) {
+        queryParams.append('search', filters.searchQuery);
+      }
+      
+      // Price range filters
+      if (filters?.minPrice !== undefined && filters.minPrice > 0) {
+        queryParams.append('minPrice', filters.minPrice.toString());
+      }
+      
+      if (filters?.maxPrice !== undefined && filters.maxPrice > 0) {
+        queryParams.append('maxPrice', filters.maxPrice.toString());
+      }
 
       const url = `${this.baseUrl}/rooms${queryParams.toString() ? `?${queryParams}` : ''}`;
 
@@ -47,7 +77,7 @@ class RoomApiClient {
       }
 
       const data = await response.json();
-      return data.rooms;
+      return data;
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {
@@ -58,7 +88,7 @@ class RoomApiClient {
     }
   }
 
-  async getRoomById(accessToken: string, id: string): Promise<RoomWithTenant> {
+  async getRoomById(accessToken: string, id: string): Promise<Room> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -79,8 +109,8 @@ class RoomApiClient {
         throw new Error(error.message || 'Failed to fetch room');
       }
 
-      const data = await response.json();
-      return data.room;
+      const data: RoomResponse = await response.json();
+      return data.data;
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {
@@ -96,6 +126,11 @@ class RoomApiClient {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
     try {
+      console.log('RoomApiClient.createRoom called');
+      console.log('URL:', `${this.baseUrl}/rooms`);
+      console.log('Data:', data);
+      console.log('Has accessToken:', !!accessToken);
+      
       const response = await fetch(`${this.baseUrl}/rooms`, {
         method: 'POST',
         headers: {
@@ -108,15 +143,21 @@ class RoomApiClient {
 
       clearTimeout(timeoutId);
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (!response.ok) {
         const error = await response.json();
+        console.error('API error response:', error);
         throw new Error(error.message || 'Failed to create room');
       }
 
-      const responseData = await response.json();
-      return responseData.room;
+      const responseData: RoomResponse = await response.json();
+      console.log('Room created successfully:', responseData);
+      return responseData.data;
     } catch (error) {
       clearTimeout(timeoutId);
+      console.error('createRoom error:', error);
       if (error instanceof Error) {
         if (error.name === 'AbortError') throw new Error('Request timeout');
         throw error;
@@ -147,8 +188,8 @@ class RoomApiClient {
         throw new Error(error.message || 'Failed to update room');
       }
 
-      const responseData = await response.json();
-      return responseData.room;
+      const responseData: RoomResponse = await response.json();
+      return responseData.data;
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {
@@ -179,42 +220,6 @@ class RoomApiClient {
         const error = await response.json();
         throw new Error(error.message || 'Failed to delete room');
       }
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') throw new Error('Request timeout');
-        throw error;
-      }
-      throw new Error('An unexpected error occurred');
-    }
-  }
-
-  async searchRooms(accessToken: string, query: string, propertyId?: string): Promise<Room[]> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-    try {
-      const queryParams = new URLSearchParams({ q: query });
-      if (propertyId) queryParams.append('propertyId', propertyId);
-
-      const response = await fetch(`${this.baseUrl}/rooms/search?${queryParams}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to search rooms');
-      }
-
-      const data = await response.json();
-      return data.rooms;
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {

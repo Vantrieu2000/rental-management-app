@@ -23,6 +23,9 @@ class AuthApiClient {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
+      console.log('🔐 Attempting login to:', `${this.baseUrl}/auth/login`);
+      console.log('📧 Email:', credentials.email);
+
       const response = await fetch(`${this.baseUrl}/auth/login`, {
         method: 'POST',
         headers: {
@@ -34,20 +37,37 @@ class AuthApiClient {
 
       clearTimeout(timeoutId);
 
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
+        const errorText = await response.text();
+        console.error('❌ Error response:', errorText);
+        
+        let error;
+        try {
+          error = JSON.parse(errorText);
+        } catch {
+          error = { message: errorText || 'Login failed' };
+        }
+        
+        throw new Error(error.message || `HTTP ${response.status}: Login failed`);
       }
 
       const data = await response.json();
+      console.log('✅ Login successful!');
+      console.log('👤 User:', data.user?.name || data.user?.email);
+      
       return data;
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           throw new Error('Request timeout');
         }
+        console.error('❌ Login error:', error.message);
         throw error;
       }
+      console.error('❌ Unexpected error:', error);
       throw new Error('An unexpected error occurred');
     }
   }

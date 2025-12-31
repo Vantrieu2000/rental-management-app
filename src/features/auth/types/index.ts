@@ -3,7 +3,8 @@
  */
 
 export interface User {
-  id: string;
+  _id: string; // Backend uses _id (MongoDB format)
+  id?: string; // Optional alias for compatibility
   email: string;
   name: string;
   phone?: string;
@@ -34,7 +35,9 @@ export interface LoginCredentials {
 
 export interface LoginResponse {
   user: User;
-  tokens: AuthTokens;
+  
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface AuthError {

@@ -5,14 +5,18 @@
 
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
 import type { RoomsStackParamList } from '@/shared/types/navigation';
 
 // Screens
-import RoomListScreen from '@/features/rooms/screens/RoomListScreen';
+import { RoomsScreen } from '@/features/rooms/screens/RoomsScreen';
+import { RoomDetailScreen } from '@/features/rooms/screens/RoomDetailScreen';
 
 const Stack = createNativeStackNavigator<RoomsStackParamList>();
 
 export default function RoomsStack() {
+  const { t } = useTranslation();
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -22,9 +26,16 @@ export default function RoomsStack() {
     >
       <Stack.Screen
         name="RoomList"
-        component={RoomListScreen}
+        component={RoomsScreen}
         options={{
-          title: 'Rooms',
+          title: t('rooms.title'),
+        }}
+      />
+      <Stack.Screen
+        name="RoomDetail"
+        component={RoomDetailScreen}
+        options={{
+          title: t('rooms.roomDetails'),
         }}
       />
     </Stack.Navigator>

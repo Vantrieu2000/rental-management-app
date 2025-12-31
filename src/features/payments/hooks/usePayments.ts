@@ -38,11 +38,13 @@ export function usePayments(filters?: PaymentFilters) {
 
   return useQuery({
     queryKey: paymentKeys.list(filters),
-    queryFn: () => {
+    queryFn: async () => {
       if (!accessToken) throw new Error('Not authenticated');
       return paymentApi.getPayments(accessToken, filters);
     },
     enabled: !!accessToken,
+    // Return empty array if query fails or is disabled
+    placeholderData: [],
   });
 }
 

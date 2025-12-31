@@ -1,5 +1,6 @@
 {
   "common": {
+    "appName": "Rental Management",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -13,27 +14,48 @@
     "confirm": "Confirm",
     "back": "Back",
     "next": "Next",
+    "submit": "Submit",
+    "close": "Close",
     "done": "Done",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "ok": "OK",
+    "retry": "Retry",
+    "apply": "Apply",
+    "clear": "Clear",
+    "month": "month"
   },
   "navigation": {
     "dashboard": "Dashboard",
     "rooms": "Rooms",
     "payments": "Payments",
     "notifications": "Notifications",
+    "reports": "Reports",
     "settings": "Settings"
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "addRoom": "Add Room",
+    "recordPayment": "Record Payment",
+    "addTenant": "Add Tenant",
+    "reports": "Reports",
+    "totalRooms": "Total Rooms",
+    "occupiedRooms": "Occupied Rooms",
+    "unpaidRooms": "Unpaid Rooms",
+    "totalRevenue": "Total Revenue",
+    "revenueTrends": "Revenue Trends",
+    "occupancyRate": "Occupancy Rate",
+    "recentActivity": "Recent Activity",
+    "noRecentActivity": "No recent activity",
+    "overduePayments": "Overdue Payments"
+  },
   "auth": {
-    "login": {
-      "title": "Welcome Back",
-      "subtitle": "Sign in to continue",
-      "email": "Email",
-      "password": "Password",
-      "submit": "Login",
-      "biometric": "Login with Biometric",
-      "or": "OR"
-    },
+    "signIn": "Sign In",
+    "email": "Email",
+    "password": "Password",
+    "login": "Login",
+    "loginFailed": "Invalid email or password",
+    "connectedTo": "Connected to",
     "logout": "Logout",
     "errors": {
       "emailRequired": "Email is required",
@@ -54,23 +76,91 @@
   },
   "rooms": {
     "title": "Rooms",
+    "searchPlaceholder": "Search by room code, name, or tenant",
     "addRoom": "Add Room",
     "editRoom": "Edit Room",
+    "deleteRoom": "Delete Room",
+    "roomsFound": "{{count}} rooms found",
+    "roomList": "Room List",
+    "roomDetails": "Room Details",
+    "roomNumber": "Room Number",
     "roomCode": "Room Code",
     "roomName": "Room Name",
-    "status": "Status",
-    "vacant": "Vacant",
-    "occupied": "Occupied",
-    "maintenance": "Maintenance",
+    "floor": "Floor",
+    "area": "Area",
+    "price": "Price",
     "rentalPrice": "Rental Price",
     "electricityFee": "Electricity Fee",
     "waterFee": "Water Fee",
     "garbageFee": "Garbage Fee",
     "parkingFee": "Parking Fee",
     "totalFee": "Total Fee",
+    "status": {
+      "label": "Status",
+      "vacant": "Vacant",
+      "occupied": "Occupied",
+      "maintenance": "Maintenance"
+    },
+    "paymentStatus": {
+      "label": "Payment Status",
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "overdue": "Overdue"
+    },
+    "tenant": {
+      "label": "Tenant",
+      "name": "Tenant Name",
+      "phone": "Phone",
+      "moveInDate": "Move-in Date",
+      "noTenant": "No tenant"
+    },
+    "form": {
+      "roomCode": "Room Code",
+      "roomName": "Room Name",
+      "rentalPrice": "Rental Price",
+      "electricityFee": "Electricity Fee",
+      "waterFee": "Water Fee",
+      "garbageFee": "Garbage Fee",
+      "parkingFee": "Parking Fee",
+      "minPrice": "Minimum Price",
+      "maxPrice": "Maximum Price",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "roomCodeReadOnly": "Room code cannot be changed"
+    },
+    "errors": {
+      "loadFailed": "Failed to load rooms",
+      "createFailed": "Failed to create room",
+      "updateFailed": "Failed to update room",
+      "deleteFailed": "Failed to delete room",
+      "duplicateCode": "Room code already exists",
+      "networkError": "No internet connection. Please check your network.",
+      "serverError": "Server error. Please try again later.",
+      "roomNotFound": "Room not found.",
+      "invalidRequest": "Invalid request. Please check your input.",
+      "cannotDeleteWithPayments": "Cannot delete room with active payment records."
+    },
+    "success": {
+      "created": "Room created successfully",
+      "updated": "Room updated successfully",
+      "deleted": "Room deleted successfully"
+    },
+    "confirmDelete": {
+      "title": "Delete Room",
+      "message": "Are you sure you want to delete this room? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
     "currentTenant": "Current Tenant",
     "noRooms": "No rooms found",
-    "deleteConfirm": "Are you sure you want to delete this room?"
+    "deleteConfirm": "Are you sure you want to delete this room?",
+    "adjustFilters": "Try adjusting your filters or search query",
+    "priceRange": "Price Range",
+    "noProperties": {
+      "title": "No Property Information",
+      "message": "You need to create property information before adding rooms. Would you like to go to Settings to create a property?",
+      "goToSettings": "Go to Settings"
+    }
   },
   "tenants": {
     "title": "Tenants",
@@ -123,11 +213,98 @@
   "properties": {
     "title": "Properties",
     "addProperty": "Add Property",
+    "editProperty": "Edit Property",
+    "deleteProperty": "Delete Property",
     "propertyName": "Property Name",
     "address": "Address",
     "totalRooms": "Total Rooms",
+    "occupiedRooms": "Occupied",
+    "vacantRooms": "Vacant",
     "selectProperty": "Select Property",
-    "defaultRates": "Default Rates"
+    "defaultRates": "Default Rates",
+    "noProperties": "No properties yet",
+    "addFirstProperty": "Add your first property to get started",
+    
+    "types": {
+      "apartment": "Apartment",
+      "dormitory": "Dormitory",
+      "house": "House",
+      "commercial": "Commercial"
+    },
+    
+    "form": {
+      "name": "Property Name",
+      "namePlaceholder": "Enter property name",
+      "address": "Address",
+      "addressPlaceholder": "Enter property address",
+      "type": "Property Type",
+      "typePlaceholder": "Select property type",
+      "totalRooms": "Total Rooms",
+      "totalRoomsPlaceholder": "Enter number of rooms",
+      "defaultRates": "Default Rates",
+      "defaultElectricityRate": "Default Electricity Rate",
+      "defaultWaterRate": "Default Water Rate",
+      "defaultGarbageRate": "Default Garbage Fee",
+      "defaultParkingRate": "Default Parking Fee",
+      "billingSettings": "Billing Settings",
+      "billingDayOfMonth": "Billing Day of Month",
+      "billingDayHelper": "Day of month for billing (1-31)",
+      "reminderDaysBefore": "Reminder Days Before",
+      "reminderDaysHelper": "Days to remind before due date (0-30)",
+      "submit": "Save Property",
+      "cancel": "Cancel"
+    },
+    
+    "statistics": {
+      "totalProperties": "Total Properties",
+      "totalRooms": "Total Rooms",
+      "occupancyRate": "Occupancy Rate"
+    },
+    
+    "confirmDelete": {
+      "title": "Delete Property",
+      "message": "Are you sure you want to delete this property?",
+      "messageWithRooms": "This property has {{count}} rooms. Deleting it will also delete all associated rooms and data. This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    
+    "success": {
+      "created": "Property created successfully",
+      "updated": "Property updated successfully",
+      "deleted": "Property deleted successfully"
+    },
+    
+    "errors": {
+      "loadFailed": "Failed to load properties",
+      "createFailed": "Failed to create property",
+      "updateFailed": "Failed to update property",
+      "deleteFailed": "Failed to delete property",
+      "notFound": "Property not found",
+      "validationError": "Please check your input",
+      "networkError": "No internet connection",
+      "serverError": "Server error. Please try again later",
+      "cannotDeleteWithRooms": "Cannot delete property with existing rooms",
+      "formHasErrors": "Please fix the errors before submitting"
+    },
+    
+    "validation": {
+      "nameRequired": "Property name is required",
+      "nameMaxLength": "Property name must be at most 100 characters",
+      "addressRequired": "Address is required",
+      "addressMaxLength": "Address must be at most 200 characters",
+      "typeRequired": "Property type is required",
+      "totalRoomsRequired": "Total rooms is required",
+      "totalRoomsPositive": "Total rooms must be a positive number",
+      "totalRoomsInteger": "Total rooms must be a whole number",
+      "rateNonNegative": "Rate must be non-negative",
+      "billingDayInteger": "Billing day must be a whole number",
+      "billingDayMin": "Billing day must be between 1-31",
+      "billingDayMax": "Billing day must be between 1-31",
+      "reminderDaysInteger": "Reminder days must be a whole number",
+      "reminderDaysMin": "Reminder days must be between 0-30",
+      "reminderDaysMax": "Reminder days must be between 0-30"
+    }
   },
   "maintenance": {
     "title": "Maintenance",
