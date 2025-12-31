@@ -18,6 +18,9 @@ export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
+  TenantCheck: undefined;
+  TenantResult: { results: any[] }; // TenantPaymentResult[]
+  TenantDetail: { result: any }; // TenantPaymentResult
 };
 
 // Main Tab Navigator

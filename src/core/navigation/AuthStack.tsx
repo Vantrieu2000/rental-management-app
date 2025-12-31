@@ -9,6 +9,9 @@ import type { AuthStackParamList } from '@/shared/types/navigation';
 
 // Screens
 import LoginScreen from '@/features/auth/screens/LoginScreen';
+import { TenantCheckScreen } from '@/features/tenant-portal/screens/TenantCheckScreen';
+import { TenantResultScreen } from '@/features/tenant-portal/screens/TenantResultScreen';
+import { TenantDetailScreen } from '@/features/tenant-portal/screens/TenantDetailScreen';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -21,6 +24,9 @@ export default function AuthStack() {
       }}
     >
       <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="TenantCheck" component={TenantCheckScreen} />
+      <Stack.Screen name="TenantResult" component={TenantResultScreen} />
+      <Stack.Screen name="TenantDetail" component={TenantDetailScreen} />
     </Stack.Navigator>
   );
 }

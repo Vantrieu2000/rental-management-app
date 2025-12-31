@@ -52,7 +52,7 @@ class PaymentApiClient {
       }
 
       const data = await response.json();
-      return data.payments;
+      return data; // Backend returns array directly, not { payments: [...] }
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {
@@ -85,7 +85,7 @@ class PaymentApiClient {
       }
 
       const data = await response.json();
-      return data.payment;
+      return data; // Backend returns payment directly
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {
@@ -119,7 +119,7 @@ class PaymentApiClient {
       }
 
       const responseData = await response.json();
-      return responseData.payment;
+      return responseData; // Backend returns payment directly
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {
@@ -157,7 +157,7 @@ class PaymentApiClient {
       }
 
       const responseData = await response.json();
-      return responseData.payment;
+      return responseData; // Backend returns payment directly
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {
@@ -190,7 +190,7 @@ class PaymentApiClient {
       }
 
       const data = await response.json();
-      return data.payments;
+      return data; // Backend returns array directly
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {
@@ -206,7 +206,7 @@ class PaymentApiClient {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
     try {
-      const response = await fetch(`${this.baseUrl}/rooms/${roomId}/payment-history`, {
+      const response = await fetch(`${this.baseUrl}/payments/rooms/${roomId}/payment-history`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -223,7 +223,7 @@ class PaymentApiClient {
       }
 
       const data = await response.json();
-      return data.payments;
+      return data; // Backend returns array directly
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {
@@ -262,7 +262,7 @@ class PaymentApiClient {
       }
 
       const data = await response.json();
-      return data.calculation;
+      return data; // Backend returns FeeCalculationResponseDto directly
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {
@@ -311,7 +311,7 @@ class PaymentApiClient {
       }
 
       const data = await response.json();
-      return data.statistics;
+      return data; // Backend returns PaymentStatisticsDto directly
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {

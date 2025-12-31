@@ -114,6 +114,29 @@ export default function LoginScreen({ navigation }: Props) {
             >
               {t('auth.login')}
             </Button>
+
+            {/* Divider */}
+            <View style={styles.dividerContainer}>
+              <View style={styles.dividerLine} />
+              <Text variant="bodySmall" style={styles.dividerText}>
+                hoặc
+              </Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            {/* Tenant Portal Button */}
+            <Button
+              mode="outlined"
+              onPress={() => navigation.navigate('TenantCheck')}
+              icon="account-search"
+              style={styles.tenantButton}
+              labelStyle={styles.tenantButtonLabel}
+            >
+              Tra Cứu Thanh Toán
+            </Button>
+            <Text variant="bodySmall" style={styles.tenantHint}>
+              Dành cho người thuê
+            </Text>
           </Card.Content>
         </Card>
       </View>
@@ -160,6 +183,34 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 8,
     marginBottom: 16,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#e0e0e0',
+  },
+  dividerText: {
+    marginHorizontal: 12,
+    color: '#999',
+  },
+  tenantButton: {
+    marginBottom: 8,
+    borderColor: '#4caf50',
+    borderWidth: 2,
+  },
+  tenantButtonLabel: {
+    color: '#4caf50',
+    fontWeight: '600',
+  },
+  tenantHint: {
+    textAlign: 'center',
+    color: '#4caf50',
+    marginBottom: 8,
   },
   hint: {
     textAlign: 'center',
