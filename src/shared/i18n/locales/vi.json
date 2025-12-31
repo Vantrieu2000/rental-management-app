@@ -53,7 +53,62 @@
     "type": "Loại",
     "status": "Trạng thái",
     "rooms": "Phòng",
-    "noProperties": "Chưa có bất động sản nào"
+    "noProperties": "Chưa có bất động sản nào",
+    "statistics": {
+      "totalProperties": "Tổng Số Bất Động Sản",
+      "totalRooms": "Tổng Số Phòng",
+      "occupiedRooms": "Phòng Đã Thuê",
+      "vacantRooms": "Phòng Trống"
+    },
+    "totalRooms": "Tổng số phòng",
+    "occupiedRooms": "Phòng đã thuê",
+    "vacantRooms": "Phòng trống",
+    "types": {
+      "apartment": "Chung cư",
+      "house": "Nhà riêng",
+      "villa": "Biệt thự",
+      "dormitory": "Ký túc xá",
+      "other": "Khác"
+    },
+    "form": {
+      "name": "Tên bất động sản",
+      "namePlaceholder": "Nhập tên bất động sản",
+      "address": "Địa chỉ",
+      "addressPlaceholder": "Nhập địa chỉ đầy đủ",
+      "type": "Loại hình",
+      "totalRooms": "Tổng số phòng",
+      "totalRoomsPlaceholder": "Nhập số phòng",
+      "defaultRates": "Đơn Giá Mặc Định",
+      "defaultElectricityRate": "Giá điện",
+      "defaultWaterRate": "Giá nước",
+      "defaultGarbageRate": "Phí rác",
+      "defaultParkingRate": "Phí gửi xe",
+      "billingSettings": "Cài Đặt Thanh Toán",
+      "billingDayOfMonth": "Ngày chốt hóa đơn",
+      "billingDayHelper": "Ngày trong tháng để tạo hóa đơn (1-31)",
+      "reminderDaysBefore": "Nhắc trước (ngày)",
+      "reminderDaysHelper": "Số ngày nhắc nhở trước khi đến hạn thanh toán",
+      "cancel": "Hủy",
+      "submit": "Xác nhận"
+    },
+    "errors": {
+      "loadFailed": "Không thể tải danh sách bất động sản",
+      "createFailed": "Không thể tạo bất động sản",
+      "updateFailed": "Không thể cập nhật bất động sản",
+      "deleteFailed": "Không thể xóa bất động sản"
+    },
+    "success": {
+      "created": "Tạo bất động sản thành công",
+      "updated": "Cập nhật bất động sản thành công",
+      "deleted": "Xóa bất động sản thành công"
+    },
+    "confirmDelete": {
+      "title": "Xóa Bất Động Sản",
+      "message": "Bạn có chắc chắn muốn xóa bất động sản này? Hành động này không thể hoàn tác.",
+      "messageWithRooms": "Bất động sản này có {{count}} phòng. Bạn có chắc chắn muốn xóa? Tất cả dữ liệu liên quan sẽ bị xóa và không thể khôi phục.",
+      "cancel": "Hủy",
+      "confirm": "Xóa"
+    }
   },
   "rooms": {
     "title": "Phòng",
@@ -92,7 +147,23 @@
       "name": "Tên người thuê",
       "phone": "Số điện thoại",
       "moveInDate": "Ngày vào ở",
-      "noTenant": "Chưa có người thuê"
+      "paymentDueDate": "Ngày đóng tiền hàng tháng",
+      "noTenant": "Chưa có người thuê",
+      "roomEmpty": "Phòng hiện đang trống",
+      "addTenant": "Thêm người thuê",
+      "editTenant": "Sửa thông tin người thuê",
+      "removeTenant": "Xóa người thuê",
+      "confirmRemove": {
+        "title": "Xóa người thuê",
+        "message": "Bạn có chắc chắn muốn xóa người thuê khỏi phòng này? Phòng sẽ chuyển về trạng thái trống.",
+        "confirm": "Xóa",
+        "cancel": "Hủy"
+      },
+      "errors": {
+        "nameRequired": "Vui lòng nhập tên người thuê",
+        "phoneRequired": "Vui lòng nhập số điện thoại",
+        "phoneInvalid": "Số điện thoại không hợp lệ (10-11 số)"
+      }
     },
     "form": {
       "roomCode": "Mã Phòng",
@@ -195,6 +266,6 @@
     "version": "Phiên bản",
     "logout": "Đăng Xuất",
     "changeLanguage": "Thay Đổi Ngôn Ngữ",
-    "languageChanged": "Đã thay đổi ngôn ngữ thành công",
+    "languageChanged": "Đã thay đổi ngôn ngữ thành công"
   }
 }

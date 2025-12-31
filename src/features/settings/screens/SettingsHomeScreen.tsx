@@ -144,6 +144,7 @@ export default function SettingsHomeScreen({ navigation }: Props) {
         <List.Subheader>{t('settings.title')}</List.Subheader>
         
         <List.Item
+          key="language"
           title={t('settings.language')}
           description={currentLanguageName}
           left={props => <List.Icon {...props} icon="translate" />}
@@ -152,6 +153,7 @@ export default function SettingsHomeScreen({ navigation }: Props) {
         />
 
         <List.Item
+          key="notifications"
           title={t('settings.notifications')}
           description="Quản lý thông báo"
           left={props => <List.Icon {...props} icon="bell" />}
@@ -160,6 +162,7 @@ export default function SettingsHomeScreen({ navigation }: Props) {
         />
 
         <List.Item
+          key="security"
           title={t('settings.security')}
           description="Mật khẩu và bảo mật"
           left={props => <List.Icon {...props} icon="shield-check" />}
@@ -175,6 +178,7 @@ export default function SettingsHomeScreen({ navigation }: Props) {
         <List.Subheader>{t('settings.about')}</List.Subheader>
         
         <List.Item
+          key="version"
           title={t('settings.version')}
           description="1.0.0"
           left={props => <List.Icon {...props} icon="information" />}

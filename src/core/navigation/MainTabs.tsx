@@ -7,6 +7,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { Platform } from 'react-native';
 import type { MainTabParamList } from '@/shared/types/navigation';
 
 // Stack Navigators
@@ -41,9 +42,9 @@ export default function MainTabs() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E0E0E0',
-          height: 'auto',
-          paddingBottom: 8,
-          paddingTop: 8,
+          paddingTop: 0,
+          paddingBottom: Platform.OS === 'ios' ? 20 : 0,
+          height: Platform.OS === 'ios' ? 85 : 65,
         },
         tabBarLabelStyle: {
           fontSize: 11,
@@ -101,7 +102,7 @@ export default function MainTabs() {
           },
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="ReportsTab"
         component={ReportsStack}
         options={{
@@ -110,7 +111,7 @@ export default function MainTabs() {
             <MaterialCommunityIcons name="file-chart" size={size} color={color} />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="SettingsTab"
         component={SettingsStack}

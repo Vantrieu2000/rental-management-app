@@ -53,7 +53,62 @@
     "type": "Type",
     "status": "Status",
     "rooms": "Rooms",
-    "noProperties": "No properties yet"
+    "noProperties": "No properties yet",
+    "statistics": {
+      "totalProperties": "Total Properties",
+      "totalRooms": "Total Rooms",
+      "occupiedRooms": "Occupied Rooms",
+      "vacantRooms": "Vacant Rooms"
+    },
+    "totalRooms": "Total rooms",
+    "occupiedRooms": "Occupied rooms",
+    "vacantRooms": "Vacant rooms",
+    "types": {
+      "apartment": "Apartment",
+      "house": "House",
+      "villa": "Villa",
+      "dormitory": "Dormitory",
+      "other": "Other"
+    },
+    "form": {
+      "name": "Property Name",
+      "namePlaceholder": "Enter property name",
+      "address": "Address",
+      "addressPlaceholder": "Enter full address",
+      "type": "Property Type",
+      "totalRooms": "Total Rooms",
+      "totalRoomsPlaceholder": "Enter number of rooms",
+      "defaultRates": "Default Utility Rates",
+      "defaultElectricityRate": "Electricity Rate",
+      "defaultWaterRate": "Water Rate",
+      "defaultGarbageRate": "Garbage Fee",
+      "defaultParkingRate": "Parking Fee",
+      "billingSettings": "Billing Settings",
+      "billingDayOfMonth": "Billing Day",
+      "billingDayHelper": "Day of month to generate invoices (1-31)",
+      "reminderDaysBefore": "Reminder Days",
+      "reminderDaysHelper": "Days before due date to send reminders",
+      "cancel": "Cancel",
+      "submit": "Submit"
+    },
+    "errors": {
+      "loadFailed": "Failed to load properties",
+      "createFailed": "Failed to create property",
+      "updateFailed": "Failed to update property",
+      "deleteFailed": "Failed to delete property"
+    },
+    "success": {
+      "created": "Property created successfully",
+      "updated": "Property updated successfully",
+      "deleted": "Property deleted successfully"
+    },
+    "confirmDelete": {
+      "title": "Delete Property",
+      "message": "Are you sure you want to delete this property? This action cannot be undone.",
+      "messageWithRooms": "This property has {{count}} rooms. Are you sure you want to delete it? All related data will be permanently deleted.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
   },
   "rooms": {
     "title": "Rooms",
@@ -92,7 +147,23 @@
       "name": "Tenant Name",
       "phone": "Phone",
       "moveInDate": "Move-in Date",
-      "noTenant": "No tenant"
+      "paymentDueDate": "Monthly Payment Due Date",
+      "noTenant": "No tenant",
+      "roomEmpty": "Room is currently vacant",
+      "addTenant": "Add Tenant",
+      "editTenant": "Edit Tenant Info",
+      "removeTenant": "Remove Tenant",
+      "confirmRemove": {
+        "title": "Remove Tenant",
+        "message": "Are you sure you want to remove the tenant from this room? The room will be set to vacant status.",
+        "confirm": "Remove",
+        "cancel": "Cancel"
+      },
+      "errors": {
+        "nameRequired": "Please enter tenant name",
+        "phoneRequired": "Please enter phone number",
+        "phoneInvalid": "Invalid phone number (10-11 digits)"
+      }
     },
     "form": {
       "roomCode": "Room Code",

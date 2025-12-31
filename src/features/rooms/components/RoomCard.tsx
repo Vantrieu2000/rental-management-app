@@ -75,6 +75,7 @@ const RoomCardComponent = ({ room, onPress }: RoomCardProps) => {
             <View style={styles.paymentStatus}>
               <Chip
                 mode="flat"
+                disabled
                 textStyle={styles.chipText}
                 style={[
                   styles.chip,

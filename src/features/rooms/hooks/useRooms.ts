@@ -11,6 +11,7 @@ import {
   RoomFilters,
   CreateRoomDto,
   UpdateRoomDto,
+  UpdateTenantDto,
   RoomsResponse,
 } from '../types';
 
@@ -276,6 +277,206 @@ export function useDeleteRoom() {
       // Remove the specific room from cache
       queryClient.removeQueries({ queryKey: roomKeys.detail(deletedId) });
       // Invalidate all room lists to refetch
+      queryClient.invalidateQueries({ queryKey: roomKeys.lists() });
+    },
+  });
+}
+
+/**
+ * Hook to update tenant information
+ */
+export function useUpdateTenant() {
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const queryClient = useQueryClient();
+  const { shouldUseMock } = require('@/shared/config/api.config');
+  const useMock = shouldUseMock('rooms');
+
+  return useMutation<Room, Error, { roomId: string; data: UpdateTenantDto }, { previousRoom: any; previousRooms: [any, any][] }>({
+    mutationFn: async ({ roomId, data }) => {
+      // Mock API doesn't need token
+      if (!useMock && !accessToken) {
+        throw new Error('No authentication token');
+      }
+      return roomApi.updateTenant(accessToken || '', roomId, data);
+    },
+    onMutate: async ({ roomId, data }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: roomKeys.detail(roomId) });
+      await queryClient.cancelQueries({ queryKey: roomKeys.lists() });
+
+      // Snapshot the previous values
+      const previousRoom = queryClient.getQueryData(roomKeys.detail(roomId));
+      const previousRooms = queryClient.getQueriesData({ queryKey: roomKeys.lists() });
+
+      // Optimistically update the room detail
+      queryClient.setQueryData<Room>(roomKeys.detail(roomId), (old) => {
+        if (!old) return old;
+        
+        // Check if all fields are empty (means remove tenant)
+        const isEmpty = !data.name && !data.phone && !data.moveInDate;
+        
+        if (isEmpty) {
+          return { 
+            ...old, 
+            status: 'vacant' as const,
+            currentTenant: undefined,
+            updatedAt: new Date().toISOString() 
+          };
+        } else {
+          return { 
+            ...old, 
+            status: 'occupied' as const,
+            currentTenant: {
+              id: old.currentTenant?.id || '',
+              name: data.name || old.currentTenant?.name || '',
+              phone: data.phone || old.currentTenant?.phone || '',
+              moveInDate: data.moveInDate || old.currentTenant?.moveInDate || '',
+              paymentDueDate: data.paymentDueDate || old.currentTenant?.paymentDueDate || new Date().toISOString(),
+            },
+            updatedAt: new Date().toISOString() 
+          };
+        }
+      });
+
+      // Optimistically update the room in lists
+      queryClient.setQueriesData<RoomsResponse>(
+        { queryKey: roomKeys.lists() },
+        (old) => {
+          if (!old || !old.data || !Array.isArray(old.data)) {
+            return old;
+          }
+          
+          return {
+            ...old,
+            data: old.data.map((room) => {
+              if (room.id !== roomId) return room;
+              
+              const isEmpty = !data.name && !data.phone && !data.moveInDate;
+              
+              if (isEmpty) {
+                return { 
+                  ...room, 
+                  status: 'vacant' as const,
+                  currentTenant: undefined,
+                  updatedAt: new Date().toISOString() 
+                };
+              } else {
+                return { 
+                  ...room, 
+                  status: 'occupied' as const,
+                  currentTenant: {
+                    id: room.currentTenant?.id || '',
+                    name: data.name || room.currentTenant?.name || '',
+                    phone: data.phone || room.currentTenant?.phone || '',
+                    moveInDate: data.moveInDate || room.currentTenant?.moveInDate || '',
+                    paymentDueDate: data.paymentDueDate || room.currentTenant?.paymentDueDate || new Date().toISOString(),
+                  },
+                  updatedAt: new Date().toISOString() 
+                };
+              }
+            }),
+          };
+        }
+      );
+
+      return { previousRoom, previousRooms };
+    },
+    onError: (_err, { roomId }, context) => {
+      // Rollback on error
+      if (context?.previousRoom) {
+        queryClient.setQueryData(roomKeys.detail(roomId), context.previousRoom);
+      }
+      if (context?.previousRooms) {
+        context.previousRooms.forEach(([queryKey, data]: [any, any]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+    },
+    onSuccess: (updatedRoom) => {
+      // Invalidate to refetch with real data
+      queryClient.invalidateQueries({ queryKey: roomKeys.detail(updatedRoom.id) });
+      queryClient.invalidateQueries({ queryKey: roomKeys.lists() });
+    },
+  });
+}
+
+/**
+ * Hook to remove tenant from room
+ */
+export function useRemoveTenant() {
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const queryClient = useQueryClient();
+  const { shouldUseMock } = require('@/shared/config/api.config');
+  const useMock = shouldUseMock('rooms');
+
+  return useMutation<Room, Error, string, { previousRoom: any; previousRooms: [any, any][] }>({
+    mutationFn: async (roomId: string) => {
+      // Mock API doesn't need token
+      if (!useMock && !accessToken) {
+        throw new Error('No authentication token');
+      }
+      return roomApi.removeTenant(accessToken || '', roomId);
+    },
+    onMutate: async (roomId) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: roomKeys.detail(roomId) });
+      await queryClient.cancelQueries({ queryKey: roomKeys.lists() });
+
+      // Snapshot the previous values
+      const previousRoom = queryClient.getQueryData(roomKeys.detail(roomId));
+      const previousRooms = queryClient.getQueriesData({ queryKey: roomKeys.lists() });
+
+      // Optimistically update the room detail
+      queryClient.setQueryData<Room>(roomKeys.detail(roomId), (old) => {
+        if (!old) return old;
+        return { 
+          ...old, 
+          status: 'vacant' as const,
+          currentTenant: undefined,
+          updatedAt: new Date().toISOString() 
+        };
+      });
+
+      // Optimistically update the room in lists
+      queryClient.setQueriesData<RoomsResponse>(
+        { queryKey: roomKeys.lists() },
+        (old) => {
+          if (!old || !old.data || !Array.isArray(old.data)) {
+            return old;
+          }
+          
+          return {
+            ...old,
+            data: old.data.map((room) =>
+              room.id === roomId
+                ? { 
+                    ...room, 
+                    status: 'vacant' as const,
+                    currentTenant: undefined,
+                    updatedAt: new Date().toISOString() 
+                  }
+                : room
+            ),
+          };
+        }
+      );
+
+      return { previousRoom, previousRooms };
+    },
+    onError: (_err, roomId, context) => {
+      // Rollback on error
+      if (context?.previousRoom) {
+        queryClient.setQueryData(roomKeys.detail(roomId), context.previousRoom);
+      }
+      if (context?.previousRooms) {
+        context.previousRooms.forEach(([queryKey, data]: [any, any]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+    },
+    onSuccess: (updatedRoom) => {
+      // Invalidate to refetch with real data
+      queryClient.invalidateQueries({ queryKey: roomKeys.detail(updatedRoom.id) });
       queryClient.invalidateQueries({ queryKey: roomKeys.lists() });
     },
   });

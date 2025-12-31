@@ -13,6 +13,7 @@ export interface CurrentTenant {
   name: string;
   phone: string;
   moveInDate: string;
+  paymentDueDate: string;
 }
 
 // Room entity
@@ -62,6 +63,13 @@ export interface UpdateRoomDto {
   parkingFee?: number;
 }
 
+export interface UpdateTenantDto {
+  name?: string;
+  phone?: string;
+  moveInDate?: string;
+  paymentDueDate?: string;
+}
+
 // Filter Types
 export interface RoomFilters {
   propertyId?: string;
@@ -70,6 +78,8 @@ export interface RoomFilters {
   searchQuery?: string;
   minPrice?: number;
   maxPrice?: number;
+  page?: number;
+  limit?: number;
 }
 
 // API Response Types

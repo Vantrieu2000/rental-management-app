@@ -5,7 +5,7 @@
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { env } from '../config/env';
 
 // Import translations
@@ -15,12 +15,16 @@ import en from './locales/en.json';
 // Storage key for language preference
 const LANGUAGE_KEY = 'app_language';
 
+// Supported languages
+export const SUPPORTED_LANGUAGES = ['en', 'vi'] as const;
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+
 /**
  * Get stored language preference
  */
 const getStoredLanguage = async (): Promise<string> => {
   try {
-    const stored = await SecureStore.getItemAsync(LANGUAGE_KEY);
+    const stored = await AsyncStorage.getItem(LANGUAGE_KEY);
     return stored || env.defaultLanguage;
   } catch (error) {
     console.error('Failed to get stored language:', error);
@@ -33,7 +37,7 @@ const getStoredLanguage = async (): Promise<string> => {
  */
 export const setStoredLanguage = async (language: string): Promise<void> => {
   try {
-    await SecureStore.setItemAsync(LANGUAGE_KEY, language);
+    await AsyncStorage.setItem(LANGUAGE_KEY, language);
   } catch (error) {
     console.error('Failed to store language:', error);
   }
@@ -54,7 +58,7 @@ export const initI18n = async (): Promise<void> => {
       },
       lng: storedLanguage,
       fallbackLng: 'vi',
-      compatibilityJSON: 'v3',
+      compatibilityJSON: 'v4',
       interpolation: {
         escapeValue: false,
       },
@@ -86,5 +90,26 @@ export const getAvailableLanguages = () => [
   { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
 ];
+
+/**
+ * Custom hook for managing language preferences
+ */
+export const useLanguage = () => {
+  const currentLanguage = i18n.language as SupportedLanguage;
+
+  const changeLanguageCallback = async (language: SupportedLanguage) => {
+    try {
+      await changeLanguage(language);
+    } catch (error) {
+      console.error('Error changing language:', error);
+      throw error;
+    }
+  };
+
+  return {
+    currentLanguage,
+    changeLanguage: changeLanguageCallback,
+  };
+};
 
 export default i18n;
