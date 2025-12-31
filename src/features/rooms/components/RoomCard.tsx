@@ -6,7 +6,7 @@
 
 import React, { memo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Card, Text, useTheme, Chip } from 'react-native-paper';
+import { Card, Text, useTheme } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { Room } from '../types';
 import { formatCurrency } from '../utils/formatCurrency';
@@ -73,10 +73,7 @@ const RoomCardComponent = ({ room, onPress }: RoomCardProps) => {
           {/* Payment Status (if available) */}
           {room.paymentStatus && (
             <View style={styles.paymentStatus}>
-              <Chip
-                mode="flat"
-                disabled
-                textStyle={styles.chipText}
+              <View
                 style={[
                   styles.chip,
                   {
@@ -89,8 +86,10 @@ const RoomCardComponent = ({ room, onPress }: RoomCardProps) => {
                   },
                 ]}
               >
-                {t(`rooms.paymentStatus.${room.paymentStatus}`)}
-              </Chip>
+                <Text style={styles.chipText}>
+                  {t(`rooms.paymentStatus.${room.paymentStatus}`)}
+                </Text>
+              </View>
             </View>
           )}
         </Card.Content>
@@ -148,6 +147,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontWeight: 'bold',
+    textDecorationLine: 'none',
   },
   priceLabel: {
     opacity: 0.6,
@@ -158,8 +158,12 @@ const styles = StyleSheet.create({
   },
   chip: {
     alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
   },
   chipText: {
     fontSize: 12,
+    fontWeight: '500',
   },
 });

@@ -275,7 +275,7 @@ export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
                       {t('rooms.tenant.paymentDueDate')}
                     </Text>
                     <Text variant="titleMedium" style={styles.tenantValue}>
-                      {new Date(room.currentTenant.paymentDueDate).toLocaleDateString(locale)}
+                      Ngày {room.currentTenant.paymentDueDay} hàng tháng
                     </Text>
                   </View>
                 </View>

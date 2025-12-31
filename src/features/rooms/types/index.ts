@@ -13,7 +13,7 @@ export interface CurrentTenant {
   name: string;
   phone: string;
   moveInDate: string;
-  paymentDueDate: string;
+  paymentDueDay: number; // Day of month (1-31)
 }
 
 // Room entity
@@ -67,7 +67,7 @@ export interface UpdateTenantDto {
   name?: string;
   phone?: string;
   moveInDate?: string;
-  paymentDueDate?: string;
+  paymentDueDay?: number; // Day of month (1-31)
 }
 
 // Filter Types

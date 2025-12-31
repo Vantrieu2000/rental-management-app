@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, FlatList } from 'react-native';
 import { List, Divider, Avatar, Snackbar } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/auth.store';
@@ -109,8 +109,9 @@ export default function SettingsHomeScreen({ navigation }: Props) {
     }
   };
 
-  return (
-    <ScrollView style={styles.container}>
+  // Render header content (profile + settings options)
+  const renderHeader = () => (
+    <>
       {/* User Profile Section */}
       <View style={styles.profileSection}>
         <Avatar.Text 
@@ -123,17 +124,6 @@ export default function SettingsHomeScreen({ navigation }: Props) {
           description={user?.email || ''}
           titleStyle={styles.profileName}
           descriptionStyle={styles.profileEmail}
-        />
-      </View>
-
-      <Divider />
-
-      {/* Properties Section */}
-      <View style={styles.propertiesSection}>
-        <PropertiesSection
-          onAddProperty={handleAddProperty}
-          onEditProperty={handleEditProperty}
-          onDeleteProperty={handleDeleteProperty}
         />
       </View>
 
@@ -187,6 +177,18 @@ export default function SettingsHomeScreen({ navigation }: Props) {
 
       <Divider />
 
+      {/* Properties Section Header */}
+      <List.Section>
+        <List.Subheader>{t('properties.title')}</List.Subheader>
+      </List.Section>
+    </>
+  );
+
+  // Render footer content (logout button)
+  const renderFooter = () => (
+    <>
+      <Divider style={styles.footerDivider} />
+
       {/* Logout */}
       <List.Item
         title={t('settings.logout')}
@@ -194,6 +196,26 @@ export default function SettingsHomeScreen({ navigation }: Props) {
         left={props => <List.Icon {...props} icon="logout" color="#f44336" />}
         onPress={handleLogout}
         style={styles.logoutItem}
+      />
+    </>
+  );
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
+        data={[{ key: 'properties' }]}
+        keyExtractor={(item) => item.key}
+        renderItem={() => (
+          <View style={styles.propertiesSection}>
+            <PropertiesSection
+              onAddProperty={handleAddProperty}
+              onEditProperty={handleEditProperty}
+              onDeleteProperty={handleDeleteProperty}
+            />
+          </View>
+        )}
       />
 
       {/* Property Form Modal */}
@@ -223,7 +245,7 @@ export default function SettingsHomeScreen({ navigation }: Props) {
       >
         {snackbarMessage}
       </Snackbar>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -254,6 +276,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 16,
     minHeight: 200,
+  },
+  footerDivider: {
+    marginTop: 16,
   },
   logoutItem: {
     backgroundColor: '#fff',

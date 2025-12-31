@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, StyleSheet, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
 import {
   Modal,
   Portal,
@@ -41,9 +41,8 @@ export function EditTenantModal({
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [moveInDate, setMoveInDate] = useState(new Date());
-  const [paymentDueDate, setPaymentDueDate] = useState(new Date());
+  const [paymentDueDay, setPaymentDueDay] = useState(1);
   const [showMoveInDatePicker, setShowMoveInDatePicker] = useState(false);
-  const [showPaymentDueDatePicker, setShowPaymentDueDatePicker] = useState(false);
 
   // Validation errors
   const [nameError, setNameError] = useState('');
@@ -59,17 +58,13 @@ export function EditTenantModal({
           ? new Date(room.currentTenant.moveInDate)
           : new Date()
       );
-      setPaymentDueDate(
-        room.currentTenant.paymentDueDate
-          ? new Date(room.currentTenant.paymentDueDate)
-          : new Date()
-      );
+      setPaymentDueDay(room.currentTenant.paymentDueDay || 1);
     } else if (visible && !room.currentTenant) {
       // Reset form for new tenant
       setName('');
       setPhone('');
       setMoveInDate(new Date());
-      setPaymentDueDate(new Date());
+      setPaymentDueDay(1);
     }
     // Clear errors when modal opens
     setNameError('');
@@ -110,7 +105,7 @@ export function EditTenantModal({
       name: name.trim(),
       phone: phone.trim(),
       moveInDate: moveInDate.toISOString(),
-      paymentDueDate: paymentDueDate.toISOString(),
+      paymentDueDay: paymentDueDay,
     };
 
     updateTenant(
@@ -135,13 +130,6 @@ export function EditTenantModal({
     }
   };
 
-  const handlePaymentDueDateChange = (_event: any, selectedDate?: Date) => {
-    setShowPaymentDueDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setPaymentDueDate(selectedDate);
-    }
-  };
-
   return (
     <Portal>
       <Modal
@@ -161,99 +149,106 @@ export function EditTenantModal({
           <IconButton icon="close" size={24} onPress={onClose} />
         </View>
 
-        <ScrollView style={styles.content}>
-          {/* Name Input */}
-          <TextInput
-            label={t('rooms.tenant.name')}
-            value={name}
-            onChangeText={(text) => {
-              setName(text);
-              if (nameError) setNameError('');
-            }}
-            mode="outlined"
-            style={styles.input}
-            error={!!nameError}
-            disabled={isPending}
-            left={<TextInput.Icon icon="account" />}
-          />
-          {nameError ? (
-            <HelperText type="error" visible={!!nameError}>
-              {nameError}
-            </HelperText>
-          ) : null}
-
-          {/* Phone Input */}
-          <TextInput
-            label={t('rooms.tenant.phone')}
-            value={phone}
-            onChangeText={(text) => {
-              setPhone(text);
-              if (phoneError) setPhoneError('');
-            }}
-            mode="outlined"
-            style={styles.input}
-            keyboardType="phone-pad"
-            error={!!phoneError}
-            disabled={isPending}
-            left={<TextInput.Icon icon="phone" />}
-          />
-          {phoneError ? (
-            <HelperText type="error" visible={!!phoneError}>
-              {phoneError}
-            </HelperText>
-          ) : null}
-
-          {/* Move In Date */}
-          <View style={styles.dateContainer}>
-            <Text variant="bodyMedium" style={styles.dateLabel}>
-              {t('rooms.tenant.moveInDate')}
-            </Text>
-            <Button
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.keyboardAvoidingView}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+        >
+          <ScrollView 
+            style={styles.content}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={true}
+          >
+            {/* Name Input */}
+            <TextInput
+              label={t('rooms.tenant.name')}
+              value={name}
+              onChangeText={(text) => {
+                setName(text);
+                if (nameError) setNameError('');
+              }}
               mode="outlined"
-              onPress={() => setShowMoveInDatePicker(true)}
-              icon="calendar"
-              style={styles.dateButton}
+              style={styles.input}
+              error={!!nameError}
               disabled={isPending}
-            >
-              {moveInDate.toLocaleDateString()}
-            </Button>
-          </View>
-
-          {showMoveInDatePicker && (
-            <DateTimePicker
-              value={moveInDate}
-              mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleMoveInDateChange}
-              maximumDate={new Date()}
+              left={<TextInput.Icon icon="account" />}
             />
-          )}
+            {nameError ? (
+              <HelperText type="error" visible={!!nameError}>
+                {nameError}
+              </HelperText>
+            ) : null}
 
-          {/* Payment Due Date */}
-          <View style={styles.dateContainer}>
-            <Text variant="bodyMedium" style={styles.dateLabel}>
-              {t('rooms.tenant.paymentDueDate')}
-            </Text>
-            <Button
+            {/* Phone Input */}
+            <TextInput
+              label={t('rooms.tenant.phone')}
+              value={phone}
+              onChangeText={(text) => {
+                setPhone(text);
+                if (phoneError) setPhoneError('');
+              }}
               mode="outlined"
-              onPress={() => setShowPaymentDueDatePicker(true)}
-              icon="calendar-clock"
-              style={styles.dateButton}
+              style={styles.input}
+              keyboardType="phone-pad"
+              error={!!phoneError}
               disabled={isPending}
-            >
-              {paymentDueDate.toLocaleDateString()}
-            </Button>
-          </View>
-
-          {showPaymentDueDatePicker && (
-            <DateTimePicker
-              value={paymentDueDate}
-              mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handlePaymentDueDateChange}
+              left={<TextInput.Icon icon="phone" />}
             />
-          )}
-        </ScrollView>
+            {phoneError ? (
+              <HelperText type="error" visible={!!phoneError}>
+                {phoneError}
+              </HelperText>
+            ) : null}
+
+            {/* Move In Date */}
+            <View style={styles.dateContainer}>
+              <Text variant="bodyMedium" style={styles.dateLabel}>
+                {t('rooms.tenant.moveInDate')}
+              </Text>
+              <Button
+                mode="outlined"
+                onPress={() => setShowMoveInDatePicker(true)}
+                icon="calendar"
+                style={styles.dateButton}
+                disabled={isPending}
+              >
+                {moveInDate.toLocaleDateString()}
+              </Button>
+            </View>
+
+            {showMoveInDatePicker && (
+              <DateTimePicker
+                value={moveInDate}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleMoveInDateChange}
+                maximumDate={new Date()}
+              />
+            )}
+
+            {/* Payment Due Day */}
+            <TextInput
+              label={t('rooms.tenant.paymentDueDate')}
+              value={paymentDueDay.toString()}
+              onChangeText={(text) => {
+                const num = parseInt(text) || 1;
+                if (num >= 1 && num <= 31) {
+                  setPaymentDueDay(num);
+                }
+              }}
+              mode="outlined"
+              style={styles.input}
+              keyboardType="number-pad"
+              disabled={isPending}
+              left={<TextInput.Icon icon="calendar-clock" />}
+              right={<TextInput.Affix text="/tháng" />}
+              placeholder="1-31"
+            />
+            <HelperText type="info" visible={true}>
+              Ngày trong tháng để đóng tiền (1-31)
+            </HelperText>
+          </ScrollView>
+        </KeyboardAvoidingView>
 
         <View style={styles.actions}>
           <Button
@@ -283,7 +278,9 @@ const styles = StyleSheet.create({
   modalContainer: {
     margin: 20,
     borderRadius: 12,
-    maxHeight: '80%',
+  },
+  keyboardAvoidingView: {
+    maxHeight: '75%',
   },
   header: {
     flexDirection: 'row',

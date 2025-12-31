@@ -46,7 +46,7 @@ export function StatusBadge({ status }: StatusBadgeProps) {
 
 const styles = StyleSheet.create({
   badge: {
-    height: 28,
+    height: 35,
   },
   text: {
     fontSize: 12,
