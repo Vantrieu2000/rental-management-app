@@ -9,7 +9,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { queryClient } from '@/infrastructure/api/queryClient';
-import { initI18n } from '@/shared/i18n';
 import { RootNavigator } from './navigation';
 
 export default function App() {

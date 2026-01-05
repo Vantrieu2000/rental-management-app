@@ -1,258 +1,201 @@
-/**
- * Dashboard Screen
- * Main dashboard showing property overview and statistics
- */
-
-import React, { useMemo } from 'react';
-import { ScrollView, RefreshControl, StyleSheet, View } from 'react-native';
-import { Text, Divider, useTheme } from 'react-native-paper';
-import { useTranslation } from 'react-i18next';
-import type { DashboardStackScreenProps } from '@/shared/types/navigation';
-import { useDashboardStatistics, useRecentActivity, useOverduePayments } from '../hooks/useDashboard';
+import React, { useEffect } from 'react';
 import {
-  StatCard,
-  ActivityItem,
-  OverdueAlert,
-  QuickActions,
-  RevenueChart,
-  OccupancyChart,
-} from '../components';
-import { Loading, ErrorState } from '@/shared/components';
-import { RevenueData, OccupancyData } from '../types';
+  View,
+  ScrollView,
+  RefreshControl,
+  StyleSheet,
+} from 'react-native';
+import { Text, ActivityIndicator, Button } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
+import { useDashboardStats } from '../hooks/useDashboardStats';
+import { StatCard } from '../components/StatCard';
+import { OccupancyIndicator } from '../components/OccupancyIndicator';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { useLanguageStore } from '@/store/languageStore';
 
-type Props = DashboardStackScreenProps<'Dashboard'>;
-
-export default function DashboardScreen({ navigation }: Props) {
+export const DashboardScreen: React.FC = () => {
   const { t } = useTranslation();
-  const theme = useTheme();
+  const { data, isLoading, error, refetch, isRefetching } = useDashboardStats();
+  const { loadLanguage } = useLanguageStore();
 
-  // Fetch dashboard data
-  const {
-    data: statistics,
-    isLoading: isLoadingStats,
-    error: statsError,
-    refetch: refetchStats,
-  } = useDashboardStatistics();
+  // Load saved language preference on mount
+  useEffect(() => {
+    loadLanguage();
+  }, [loadLanguage]);
 
-  const {
-    data: recentActivity,
-    isLoading: isLoadingActivity,
-    error: activityError,
-    refetch: refetchActivity,
-  } = useRecentActivity(5);
-
-  const {
-    data: overduePayments,
-    isLoading: isLoadingOverdue,
-    error: overdueError,
-    refetch: refetchOverdue,
-  } = useOverduePayments();
-
-  // Combined loading and error states
-  const isLoading = isLoadingStats || isLoadingActivity || isLoadingOverdue;
-  const error = statsError || activityError || overdueError;
-
-  // Refresh handler
-  const [isRefreshing, setIsRefreshing] = React.useState(false);
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([refetchStats(), refetchActivity(), refetchOverdue()]);
-    } finally {
-      setIsRefreshing(false);
-    }
+  const handleRefresh = () => {
+    refetch();
   };
 
-  // Mock chart data (in production, this would come from API)
-  const revenueData: RevenueData[] = useMemo(
-    () => [
-      { month: 'Jan', revenue: 120000000 },
-      { month: 'Feb', revenue: 125000000 },
-      { month: 'Mar', revenue: 118000000 },
-      { month: 'Apr', revenue: 130000000 },
-      { month: 'May', revenue: 126000000 },
-      { month: 'Jun', revenue: 135000000 },
-    ],
-    []
-  );
+  const formatLastUpdated = (timestamp: string): string => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString(undefined, {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
-  const occupancyData: OccupancyData[] = useMemo(
-    () => [
-      { month: 'Jan', occupancyRate: 82 },
-      { month: 'Feb', occupancyRate: 85 },
-      { month: 'Mar', occupancyRate: 80 },
-      { month: 'Apr', occupancyRate: 88 },
-      { month: 'May', occupancyRate: 84 },
-      { month: 'Jun', occupancyRate: 86 },
-    ],
-    []
-  );
-
-  // Quick actions
-  const quickActions = useMemo(
-    () => [
-      {
-        id: 'add-room',
-        label: t('dashboard.addRoom', 'Add Room'),
-        icon: 'home-plus' as const,
-        color: '#2196F3',
-        onPress: () => navigation.getParent()?.navigate('RoomsTab', { screen: 'RoomList' }),
-      },
-      {
-        id: 'record-payment',
-        label: t('dashboard.recordPayment', 'Record Payment'),
-        icon: 'cash-plus' as const,
-        color: '#4CAF50',
-        onPress: () => navigation.getParent()?.navigate('PaymentsTab'),
-      },
-      {
-        id: 'add-tenant',
-        label: t('dashboard.addTenant', 'Add Tenant'),
-        icon: 'account-plus' as const,
-        color: '#FF9800',
-        onPress: () => navigation.getParent()?.navigate('RoomsTab', { screen: 'RoomList' }),
-      },
-      {
-        id: 'reports',
-        label: t('dashboard.reports', 'Reports'),
-        icon: 'file-chart' as const,
-        color: '#9C27B0',
-        onPress: () => navigation.getParent()?.navigate('ReportsTab'),
-      },
-    ],
-    [navigation, t]
-  );
-
-  // Show loading state on initial load
-  if (isLoading && !statistics) {
-    return <Loading />;
+  if (isLoading && !data) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" />
+        <Text style={styles.loadingText}>{t('dashboard.loading')}</Text>
+      </View>
+    );
   }
 
-  // Show error state
-  if (error && !statistics) {
+  if (error && !data) {
     return (
-      <ErrorState
-        message={error.message}
-        onRetry={() => {
-          refetchStats();
-          refetchActivity();
-          refetchOverdue();
-        }}
-      />
+      <View style={styles.centerContainer}>
+        <Text style={styles.errorText}>{t('dashboard.error')}</Text>
+        <Text style={styles.errorMessage}>{error.message}</Text>
+        <Button mode="contained" onPress={handleRefresh} style={styles.retryButton}>
+          {t('dashboard.retry')}
+        </Button>
+      </View>
+    );
+  }
+
+  if (!data) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text>{t('dashboard.noData')}</Text>
+      </View>
     );
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      refreshControl={
-        <RefreshControl
-          refreshing={isRefreshing}
-          onRefresh={handleRefresh}
-          colors={[theme.colors.primary]}
-        />
-      }
-    >
-      {/* Overdue Payments Alert */}
-      {overduePayments && overduePayments.length > 0 && (
-        <OverdueAlert
-          overduePayments={overduePayments}
-          onPress={() => navigation.getParent()?.navigate('NotificationsTab')}
-        />
-      )}
-
-      {/* Quick Actions */}
-      <QuickActions actions={quickActions} />
-
-      {/* Statistics Cards */}
-      {statistics && (
-        <View style={styles.statsContainer}>
-          <StatCard
-            title={t('dashboard.totalRooms', 'Total Rooms')}
-            value={statistics.totalRooms}
-            icon="home-group"
-            color="#2196F3"
-          />
-          <StatCard
-            title={t('dashboard.occupiedRooms', 'Occupied Rooms')}
-            value={statistics.occupiedRooms}
-            icon="home-account"
-            color="#4CAF50"
-            subtitle={`${statistics.occupancyRate}% occupancy`}
-          />
-          <StatCard
-            title={t('dashboard.unpaidRooms', 'Unpaid Rooms')}
-            value={statistics.unpaidRooms}
-            icon="alert-circle"
-            color="#F44336"
-            subtitle={`${statistics.unpaidAmount.toLocaleString('vi-VN')} VND`}
-          />
-          <StatCard
-            title={t('dashboard.totalRevenue', 'Total Revenue')}
-            value={`${(statistics.totalRevenue / 1000000).toFixed(1)}M`}
-            icon="cash-multiple"
-            color="#9C27B0"
-            subtitle="VND"
-          />
-        </View>
-      )}
-
-      {/* Charts */}
-      <View style={styles.chartsContainer}>
-        <RevenueChart data={revenueData} title={t('dashboard.revenueTrends', 'Revenue Trends')} />
-        <OccupancyChart
-          data={occupancyData}
-          title={t('dashboard.occupancyRate', 'Occupancy Rate')}
-        />
-      </View>
-
-      {/* Recent Activity */}
-      <View style={styles.activityContainer}>
-        <Text variant="titleMedium" style={styles.sectionTitle}>
-          {t('dashboard.recentActivity', 'Recent Activity')}
-        </Text>
-        <Divider style={styles.divider} />
-        {recentActivity && recentActivity.length > 0 ? (
-          recentActivity.map((activity) => <ActivityItem key={activity.id} activity={activity} />)
-        ) : (
-          <Text variant="bodyMedium" style={styles.emptyText}>
-            {t('dashboard.noRecentActivity', 'No recent activity')}
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
+        }
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text variant="headlineMedium" style={styles.title}>
+            {t('dashboard.title')}
           </Text>
-        )}
-      </View>
-    </ScrollView>
+          <Text variant="bodySmall" style={styles.lastUpdated}>
+            {t('dashboard.lastUpdated', {
+              time: formatLastUpdated(data.timestamp),
+            })}
+          </Text>
+        </View>
+
+        {/* Statistics Cards */}
+        <StatCard
+          icon="home-city"
+          label={t('dashboard.totalProperties')}
+          value={data.totalProperties}
+          color="#2196F3"
+          format="number"
+        />
+
+        <StatCard
+          icon="door"
+          label={t('dashboard.totalRooms')}
+          value={data.totalRooms}
+          color="#9C27B0"
+          format="number"
+        />
+
+        <StatCard
+          icon="door-open"
+          label={t('dashboard.occupiedRooms')}
+          value={data.occupiedRooms}
+          color="#4CAF50"
+          format="number"
+        />
+
+        <StatCard
+          icon="account-group"
+          label={t('dashboard.totalTenants')}
+          value={data.totalTenants}
+          color="#FF9800"
+          format="number"
+        />
+
+        <StatCard
+          icon="cash-multiple"
+          label={t('dashboard.currentMonthRevenue')}
+          value={data.currentMonthRevenue}
+          color="#4CAF50"
+          format="currency"
+        />
+
+        <StatCard
+          icon="clock-alert-outline"
+          label={t('dashboard.pendingPayments')}
+          value={data.pendingPayments}
+          color="#FF9800"
+          format="currency"
+        />
+
+        <StatCard
+          icon="alert-circle"
+          label={t('dashboard.overduePayments')}
+          value={data.overduePayments}
+          color="#F44336"
+          format="currency"
+        />
+
+        {/* Occupancy Indicator */}
+        <OccupancyIndicator rate={data.occupancyRate} />
+
+        {/* Bottom Spacing */}
+        <View style={styles.bottomSpacing} />
+      </ScrollView>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  contentContainer: {
-    padding: 16,
+  scrollView: {
+    flex: 1,
   },
-  statsContainer: {
-    marginBottom: 16,
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
-  chartsContainer: {
-    marginBottom: 16,
+  header: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
   },
-  activityContainer: {
-    marginBottom: 16,
-  },
-  sectionTitle: {
+  title: {
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 4,
   },
-  divider: {
-    marginBottom: 8,
-  },
-  emptyText: {
-    textAlign: 'center',
+  lastUpdated: {
     opacity: 0.6,
-    marginVertical: 24,
+  },
+  loadingText: {
+    marginTop: 16,
+    opacity: 0.7,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#F44336',
+    marginBottom: 8,
+  },
+  errorMessage: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    marginTop: 8,
+  },
+  bottomSpacing: {
+    height: 24,
   },
 });

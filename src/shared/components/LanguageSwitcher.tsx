@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Menu } from 'react-native-paper';
-import { useLanguage, type SupportedLanguage } from '@/shared/i18n';
+import { useLanguage, type SupportedLanguage } from '@/infrastructure/i18n';
 
 interface LanguageSwitcherProps {
   variant?: 'button' | 'menu';

@@ -5,7 +5,16 @@
 
 // Room status types
 export type RoomStatus = 'vacant' | 'occupied' | 'maintenance';
-export type PaymentStatus = 'paid' | 'unpaid' | 'overdue';
+export type PaymentStatus = 'paid' | 'unpaid' | 'overdue' | 'partial' | 'no_payment';
+
+// Payment status information
+export interface PaymentStatusInfo {
+  status: PaymentStatus;
+  dueDate: Date | string | null;
+  amount: number | null;
+  paidAmount: number | null;
+  latestPaymentId: string | null;
+}
 
 // Current tenant information
 export interface CurrentTenant {
@@ -30,12 +39,14 @@ export interface Room {
   waterFee: number;
   garbageFee: number;
   parkingFee: number;
+  electricityUnitPrice?: number; // VND per kWh (default: 3000)
+  waterUnitPrice?: number; // VND per m³ (default: 20000)
 
   // Current tenant
   currentTenant?: CurrentTenant;
 
   // Payment info
-  paymentStatus?: PaymentStatus;
+  paymentStatus?: PaymentStatusInfo;
 
   // Metadata
   createdAt: string;
@@ -61,6 +72,8 @@ export interface UpdateRoomDto {
   waterFee?: number;
   garbageFee?: number;
   parkingFee?: number;
+  electricityUnitPrice?: number;
+  waterUnitPrice?: number;
 }
 
 export interface UpdateTenantDto {

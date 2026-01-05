@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import {
   Text,
   Card,
@@ -24,6 +24,10 @@ import { StatusBadge } from '../components/StatusBadge';
 import { EditRoomModal } from '../components/EditRoomModal';
 import { EditTenantModal } from '../components/EditTenantModal';
 import { formatCurrency } from '../utils/formatCurrency';
+import { getRoomApi } from '../services/roomApi';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { PaymentHistory } from '@/features/payments/components/PaymentHistory';
+import { EditUsageModal } from '@/features/payments/components/EditUsageModal';
 
 interface RoomDetailScreenProps {
   route: {
@@ -34,11 +38,27 @@ interface RoomDetailScreenProps {
   navigation: any;
 }
 
+interface PaymentForEdit {
+  _id: string;
+  billingMonth: number;
+  billingYear: number;
+  billingPeriodStart: string;
+  billingPeriodEnd: string;
+  electricityUsage: number;
+  waterUsage: number;
+  previousElectricityReading: number;
+  currentElectricityReading: number;
+  previousWaterReading: number;
+  currentWaterReading: number;
+  status: string;
+}
+
 export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
   const { roomId } = route.params;
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const locale = i18n.language as 'vi' | 'en';
+  const { accessToken } = useAuth();
 
   const { data: room, isLoading, isError, refetch } = useRoom(roomId);
 
@@ -49,6 +69,8 @@ export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
   const [removeTenantDialogVisible, setRemoveTenantDialogVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editTenantModalVisible, setEditTenantModalVisible] = useState(false);
+  const [editUsageModalVisible, setEditUsageModalVisible] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<PaymentForEdit | null>(null);
 
   const handleEdit = () => {
     setEditModalVisible(true);
@@ -79,6 +101,41 @@ export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
     });
   };
 
+  const handleUpdatePaymentStatus = async (status: 'paid' | 'unpaid') => {
+    if (!accessToken) {
+      Alert.alert(t('common.error', 'Error'), t('auth.notAuthenticated', 'Not authenticated'));
+      return;
+    }
+
+    try {
+      const roomApi = getRoomApi();
+      await roomApi.updateRoomPaymentStatus(accessToken, roomId, status);
+      
+      // Refresh room data
+      await refetch();
+      
+      Alert.alert(
+        t('common.success', 'Success'),
+        t('payments.updateSuccess'),
+      );
+    } catch (error) {
+      console.error('Failed to update payment status:', error);
+      Alert.alert(
+        t('common.error', 'Error'),
+        t('payments.updateError'),
+      );
+    }
+  };
+
+  const handleEditUsage = (payment: any) => {
+    setSelectedPayment(payment);
+    setEditUsageModalVisible(true);
+  };
+
+  const handleEditUsageSuccess = () => {
+    refetch();
+  };
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -100,9 +157,6 @@ export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
       </View>
     );
   }
-
-  // Calculate total monthly cost
-  const totalMonthlyCost = room.rentalPrice + room.electricityFee + room.waterFee + room.garbageFee + room.parkingFee;
 
   return (
     <View style={styles.container}>
@@ -144,7 +198,7 @@ export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
             <View style={styles.cardHeader}>
               <IconButton icon="cash-multiple" size={24} />
               <Text variant="titleLarge" style={styles.cardTitle}>
-                Chi phí hàng tháng
+                {t('rooms.monthlyFees')}
               </Text>
             </View>
             <Divider style={styles.divider} />
@@ -187,17 +241,6 @@ export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
                 </View>
                 <Text variant="titleMedium" style={styles.feeValue}>
                   {formatCurrency(room.parkingFee, locale)}
-                </Text>
-              </View>
-
-              <Divider style={styles.totalDivider} />
-
-              <View style={styles.totalRow}>
-                <Text variant="titleLarge" style={styles.totalLabel}>
-                  Tổng cộng
-                </Text>
-                <Text variant="headlineSmall" style={[styles.totalValue, { color: theme.colors.primary }]}>
-                  {formatCurrency(totalMonthlyCost, locale)}
                 </Text>
               </View>
             </View>
@@ -275,7 +318,7 @@ export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
                       {t('rooms.tenant.paymentDueDate')}
                     </Text>
                     <Text variant="titleMedium" style={styles.tenantValue}>
-                      Ngày {room.currentTenant.paymentDueDay} hàng tháng
+                      {t('rooms.paymentDayOfMonth', { day: room.currentTenant.paymentDueDay })}
                     </Text>
                   </View>
                 </View>
@@ -302,20 +345,124 @@ export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
           </Card.Content>
         </Card>
 
+        {/* Payment Status Card */}
+        {room.status === 'occupied' && room.paymentStatus && (
+          <Card style={styles.card}>
+            <Card.Content>
+              <View style={styles.cardHeader}>
+                <IconButton icon="cash-check" size={24} />
+                <Text variant="titleLarge" style={styles.cardTitle}>
+                  {t('rooms.paymentStatusTitle')}
+                </Text>
+              </View>
+              <Divider style={styles.divider} />
+
+              <View style={styles.paymentStatusContent}>
+                <View style={styles.paymentStatusRow}>
+                  <Text variant="bodyLarge">{t('rooms.status.label')}:</Text>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      {
+                        backgroundColor:
+                          room.paymentStatus.status === 'paid'
+                            ? '#E8F5E9'
+                            : room.paymentStatus.status === 'overdue'
+                              ? '#FFEBEE'
+                              : room.paymentStatus.status === 'partial'
+                                ? '#E3F2FD'
+                                : '#FFF3E0',
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.statusText,
+                        {
+                          color:
+                            room.paymentStatus.status === 'paid'
+                              ? '#2E7D32'
+                              : room.paymentStatus.status === 'overdue'
+                                ? '#C62828'
+                                : room.paymentStatus.status === 'partial'
+                                  ? '#1565C0'
+                                  : '#E65100',
+                        },
+                      ]}
+                    >
+                      {t(`payments.status.${room.paymentStatus.status}`)}
+                    </Text>
+                  </View>
+                </View>
+
+                {room.paymentStatus.dueDate && (
+                  <View style={styles.paymentStatusRow}>
+                    <Text variant="bodyLarge">{t('rooms.paymentDueDate')}:</Text>
+                    <Text variant="titleMedium" style={styles.paymentValue}>
+                      {new Date(room.paymentStatus.dueDate).toLocaleDateString(locale)}
+                    </Text>
+                  </View>
+                )}
+
+                {room.paymentStatus.amount && (
+                  <View style={styles.paymentStatusRow}>
+                    <Text variant="bodyLarge">{t('rooms.paymentAmount')}:</Text>
+                    <Text variant="titleMedium" style={styles.paymentValue}>
+                      {formatCurrency(room.paymentStatus.amount, locale)}
+                    </Text>
+                  </View>
+                )}
+
+                {room.paymentStatus.paidAmount !== null && room.paymentStatus.paidAmount > 0 && (
+                  <View style={styles.paymentStatusRow}>
+                    <Text variant="bodyLarge">{t('rooms.paidAmount')}:</Text>
+                    <Text variant="titleMedium" style={[styles.paymentValue, { color: theme.colors.primary }]}>
+                      {formatCurrency(room.paymentStatus.paidAmount, locale)}
+                    </Text>
+                  </View>
+                )}
+
+                <Divider style={styles.divider} />
+
+                <View style={styles.paymentActions}>
+                  <Button
+                    mode="contained"
+                    icon="check-circle"
+                    onPress={() => handleUpdatePaymentStatus('paid')}
+                    disabled={room.paymentStatus.status === 'paid'}
+                    style={styles.paymentButton}
+                  >
+                    {t('rooms.markAsPaid')}
+                  </Button>
+                  <Button
+                    mode="outlined"
+                    icon="close-circle"
+                    onPress={() => handleUpdatePaymentStatus('unpaid')}
+                    disabled={room.paymentStatus.status === 'unpaid'}
+                    style={styles.paymentButton}
+                  >
+                    {t('rooms.markAsUnpaid')}
+                  </Button>
+                </View>
+              </View>
+            </Card.Content>
+          </Card>
+        )}
+
         {/* Room Metadata Card */}
         <Card style={styles.card}>
           <Card.Content>
             <View style={styles.cardHeader}>
               <IconButton icon="information" size={24} />
               <Text variant="titleLarge" style={styles.cardTitle}>
-                Thông tin khác
+                {t('rooms.otherInfo')}
               </Text>
             </View>
             <Divider style={styles.divider} />
 
             <View style={styles.metadataRow}>
               <Text variant="bodyMedium" style={styles.metadataLabel}>
-                Ngày tạo
+                {t('rooms.createdAt')}
               </Text>
               <Text variant="bodyMedium" style={styles.metadataValue}>
                 {new Date(room.createdAt).toLocaleDateString(locale)}
@@ -324,7 +471,7 @@ export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
 
             <View style={styles.metadataRow}>
               <Text variant="bodyMedium" style={styles.metadataLabel}>
-                Cập nhật lần cuối
+                {t('rooms.updatedAt')}
               </Text>
               <Text variant="bodyMedium" style={styles.metadataValue}>
                 {new Date(room.updatedAt).toLocaleDateString(locale)}
@@ -332,6 +479,9 @@ export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
             </View>
           </Card.Content>
         </Card>
+
+        {/* Payment History */}
+        <PaymentHistory roomId={roomId} onEditUsage={handleEditUsage} />
 
         {/* Delete Confirmation Dialog */}
         {deleteDialogVisible && (
@@ -451,6 +601,17 @@ export function RoomDetailScreen({ route, navigation }: RoomDetailScreenProps) {
           onSuccess={handleEditSuccess}
         />
       )}
+
+      {/* Edit Usage Modal */}
+      <EditUsageModal
+        visible={editUsageModalVisible}
+        payment={selectedPayment}
+        onDismiss={() => {
+          setEditUsageModalVisible(false);
+          setSelectedPayment(null);
+        }}
+        onSuccess={handleEditUsageSuccess}
+      />
     </View>
   );
 }
@@ -609,6 +770,34 @@ const styles = StyleSheet.create({
   tenantActions: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  paymentStatusContent: {
+    gap: 12,
+  },
+  paymentStatusRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  paymentValue: {
+    fontWeight: '500',
+  },
+  paymentActions: {
+    gap: 12,
+    marginTop: 8,
+  },
+  paymentButton: {
+    marginVertical: 4,
   },
   metadataRow: {
     flexDirection: 'row',

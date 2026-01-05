@@ -8,7 +8,7 @@ import { View, StyleSheet, FlatList } from 'react-native';
 import { List, Divider, Avatar, Snackbar } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/auth.store';
-import { getCurrentLanguage, getAvailableLanguages } from '@/shared/i18n';
+import { getCurrentLanguage, getAvailableLanguages } from '@/infrastructure/i18n';
 import type { SettingsStackScreenProps } from '@/shared/types/navigation';
 import { PropertiesSection } from '@/features/properties/components/PropertiesSection';
 import { PropertyFormModal } from '@/features/properties/components/PropertyFormModal';

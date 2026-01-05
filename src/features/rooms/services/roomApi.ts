@@ -406,6 +406,57 @@ class RoomApiClient {
       throw new Error('An unexpected error occurred');
     }
   }
+
+  async updateRoomPaymentStatus(
+    accessToken: string,
+    roomId: string,
+    status: 'paid' | 'unpaid',
+    paymentMethod?: string,
+    notes?: string,
+  ): Promise<{ success: boolean; message: string; room: any }> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+    try {
+      console.log('RoomApiClient.updateRoomPaymentStatus called');
+      console.log('URL:', `${this.baseUrl}/rooms/${roomId}/payment-status`);
+      console.log('Status:', status);
+      
+      const response = await fetch(`${this.baseUrl}/rooms/${roomId}/payment-status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ status, paymentMethod, notes }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('API error response:', error);
+        throw new Error(error.message || 'Failed to update payment status');
+      }
+
+      const responseData = await response.json();
+      console.log('Payment status updated successfully:', responseData);
+      
+      return responseData;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.error('updateRoomPaymentStatus error:', error);
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') throw new Error('Request timeout');
+        throw error;
+      }
+      throw new Error('An unexpected error occurred');
+    }
+  }
 }
 
 export const roomApi = new RoomApiClient();

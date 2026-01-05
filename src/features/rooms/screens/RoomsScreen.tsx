@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
+import { View, FlatList, StyleSheet, RefreshControl, Alert } from 'react-native';
 import { Searchbar, FAB, Text, ActivityIndicator, Button, Chip, Banner, Dialog, Portal, Paragraph } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { useRooms } from '../hooks/useRooms';
@@ -16,6 +16,8 @@ import { RoomCardSkeleton } from '../components/RoomCardSkeleton';
 import { FilterModal } from '../components/FilterModal';
 import { AddRoomModal } from '../components/AddRoomModal';
 import { Room, RoomFilters } from '../types';
+import { getRoomApi } from '../services/roomApi';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 interface RoomsScreenProps {
   navigation: any;
@@ -23,6 +25,7 @@ interface RoomsScreenProps {
 
 export function RoomsScreen({ navigation }: RoomsScreenProps) {
   const { t } = useTranslation();
+  const { accessToken } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<RoomFilters>({});
   const [filterModalVisible, setFilterModalVisible] = useState(false);
@@ -65,6 +68,29 @@ export function RoomsScreen({ navigation }: RoomsScreenProps) {
 
   const handleRoomPress = (room: Room) => {
     navigation.navigate('RoomDetail', { roomId: room.id });
+  };
+
+  const handleUpdatePaymentStatus = async (roomId: string, status: 'paid' | 'unpaid') => {
+    if (!accessToken) {
+      Alert.alert(t('common.error', 'Error'), t('auth.notAuthenticated', 'Not authenticated'));
+      return;
+    }
+
+    try {
+      const roomApi = getRoomApi();
+      await roomApi.updateRoomPaymentStatus(accessToken, roomId, status);
+      
+      // Refresh room list
+      await refetch();
+      
+      Alert.alert(
+        t('common.success', 'Success'),
+        t('rooms.payment.updateSuccess', 'Payment status updated successfully'),
+      );
+    } catch (error) {
+      console.error('Failed to update payment status:', error);
+      throw error;
+    }
   };
 
   const handleAddRoom = () => {
@@ -114,7 +140,11 @@ export function RoomsScreen({ navigation }: RoomsScreenProps) {
     (filters.paymentStatus && filters.paymentStatus.length > 0);
 
   const renderRoomCard = ({ item }: { item: Room }) => (
-    <RoomCard room={item} onPress={handleRoomPress} />
+    <RoomCard 
+      room={item} 
+      onPress={handleRoomPress}
+      onUpdatePaymentStatus={handleUpdatePaymentStatus}
+    />
   );
 
   const keyExtractor = (item: Room) => item.id;

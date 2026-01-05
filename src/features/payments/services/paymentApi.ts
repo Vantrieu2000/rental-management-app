@@ -1,342 +1,170 @@
 /**
- * Payment API Client
+ * Payment API Service
  * Handles all payment-related API calls
  */
 
 import { env } from '@/shared/config/env';
-import {
-  PaymentRecord,
-  CreatePaymentDto,
-  MarkPaidDto,
-  PaymentFilters,
-  FeeCalculation,
-} from '../types';
 
-class PaymentApiClient {
+export interface RecordUsageDto {
+  electricityUsage: number;
+  waterUsage: number;
+  previousElectricityReading?: number;
+  currentElectricityReading?: number;
+  previousWaterReading?: number;
+  currentWaterReading?: number;
+  adjustments?: number;
+  notes?: string;
+}
+
+export interface Payment {
+  _id: string;
+  roomId: string;
+  tenantId: string;
+  propertyId: string;
+  billingMonth: number;
+  billingYear: number;
+  dueDate: string;
+  rentalAmount: number;
+  electricityAmount: number;
+  waterAmount: number;
+  garbageAmount: number;
+  parkingAmount: number;
+  adjustments: number;
+  totalAmount: number;
+  status: string;
+  paidAmount: number;
+  paidDate?: string;
+  paymentMethod?: string;
+  notes?: string;
+  electricityUsage: number;
+  waterUsage: number;
+  previousElectricityReading: number;
+  currentElectricityReading: number;
+  previousWaterReading: number;
+  currentWaterReading: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+class PaymentApi {
   private baseUrl: string;
-  private timeout: number;
 
   constructor() {
     this.baseUrl = env.apiUrl;
-    this.timeout = env.apiTimeout;
   }
 
-  async getPayments(accessToken: string, filters?: PaymentFilters): Promise<PaymentRecord[]> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-    try {
-      const queryParams = new URLSearchParams();
-      if (filters?.propertyId) queryParams.append('propertyId', filters.propertyId);
-      if (filters?.roomId) queryParams.append('roomId', filters.roomId);
-      if (filters?.status) queryParams.append('status', filters.status);
-      if (filters?.startDate) queryParams.append('startDate', filters.startDate.toISOString());
-      if (filters?.endDate) queryParams.append('endDate', filters.endDate.toISOString());
-
-      const url = `${this.baseUrl}/payments${queryParams.toString() ? `?${queryParams}` : ''}`;
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to fetch payments');
-      }
-
-      const data = await response.json();
-      return data; // Backend returns array directly, not { payments: [...] }
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') throw new Error('Request timeout');
-        throw error;
-      }
-      throw new Error('An unexpected error occurred');
-    }
-  }
-
-  async getPaymentById(accessToken: string, id: string): Promise<PaymentRecord> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-    try {
-      const response = await fetch(`${this.baseUrl}/payments/${id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to fetch payment');
-      }
-
-      const data = await response.json();
-      return data; // Backend returns payment directly
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') throw new Error('Request timeout');
-        throw error;
-      }
-      throw new Error('An unexpected error occurred');
-    }
-  }
-
-  async createPayment(accessToken: string, data: CreatePaymentDto): Promise<PaymentRecord> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-    try {
-      const response = await fetch(`${this.baseUrl}/payments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(data),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create payment');
-      }
-
-      const responseData = await response.json();
-      return responseData; // Backend returns payment directly
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') throw new Error('Request timeout');
-        throw error;
-      }
-      throw new Error('An unexpected error occurred');
-    }
-  }
-
-  async markAsPaid(
-    accessToken: string,
-    id: string,
-    data: MarkPaidDto
-  ): Promise<PaymentRecord> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-    try {
-      const response = await fetch(`${this.baseUrl}/payments/${id}/mark-paid`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(data),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to mark payment as paid');
-      }
-
-      const responseData = await response.json();
-      return responseData; // Backend returns payment directly
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') throw new Error('Request timeout');
-        throw error;
-      }
-      throw new Error('An unexpected error occurred');
-    }
-  }
-
-  async getOverduePayments(accessToken: string, propertyId: string): Promise<PaymentRecord[]> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-    try {
-      const response = await fetch(`${this.baseUrl}/payments/overdue?propertyId=${propertyId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to fetch overdue payments');
-      }
-
-      const data = await response.json();
-      return data; // Backend returns array directly
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') throw new Error('Request timeout');
-        throw error;
-      }
-      throw new Error('An unexpected error occurred');
-    }
-  }
-
-  async getPaymentHistory(accessToken: string, roomId: string): Promise<PaymentRecord[]> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-    try {
-      const response = await fetch(`${this.baseUrl}/payments/rooms/${roomId}/payment-history`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to fetch payment history');
-      }
-
-      const data = await response.json();
-      return data; // Backend returns array directly
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') throw new Error('Request timeout');
-        throw error;
-      }
-      throw new Error('An unexpected error occurred');
-    }
-  }
-
-  async calculateFees(
+  /**
+   * Record utility usage for a room
+   */
+  async recordUsage(
     accessToken: string,
     roomId: string,
-    month: number,
-    year: number
-  ): Promise<FeeCalculation> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    usageData: RecordUsageDto,
+  ): Promise<Payment> {
+    const response = await fetch(`${this.baseUrl}/payments/usage?roomId=${roomId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(usageData),
+    });
 
-    try {
-      const response = await fetch(`${this.baseUrl}/payments/calculate-fees`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ roomId, month, year }),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to calculate fees');
-      }
-
-      const data = await response.json();
-      return data; // Backend returns FeeCalculationResponseDto directly
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') throw new Error('Request timeout');
-        throw error;
-      }
-      throw new Error('An unexpected error occurred');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to record usage');
     }
+
+    return response.json();
   }
 
-  async getPaymentStatistics(
+  /**
+   * Get payment history for a room
+   */
+  async getPaymentHistory(
     accessToken: string,
-    propertyId: string,
-    startDate?: Date,
-    endDate?: Date
-  ): Promise<{
-    totalRevenue: number;
-    paidCount: number;
-    unpaidCount: number;
-    overdueCount: number;
-    averagePaymentTime: number;
-    latePaymentRate: number;
-  }> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-    try {
-      const queryParams = new URLSearchParams({ propertyId });
-      if (startDate) queryParams.append('startDate', startDate.toISOString());
-      if (endDate) queryParams.append('endDate', endDate.toISOString());
-
-      const response = await fetch(`${this.baseUrl}/payments/statistics?${queryParams}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to fetch payment statistics');
-      }
-
-      const data = await response.json();
-      return data; // Backend returns PaymentStatisticsDto directly
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') throw new Error('Request timeout');
-        throw error;
-      }
-      throw new Error('An unexpected error occurred');
+    roomId: string,
+    limit?: number,
+  ): Promise<Payment[]> {
+    const url = new URL(`${this.baseUrl}/payments/history/${roomId}`);
+    if (limit) {
+      url.searchParams.append('limit', limit.toString());
     }
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to get payment history');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Update payment usage for an existing payment
+   */
+  async updatePaymentUsage(
+    accessToken: string,
+    paymentId: string,
+    usageData: RecordUsageDto,
+  ): Promise<Payment> {
+    const response = await fetch(`${this.baseUrl}/payments/${paymentId}/usage`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(usageData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update usage');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Mark payment as paid
+   */
+  async markAsPaid(
+    accessToken: string,
+    paymentId: string,
+    paidAmount?: number,
+    paymentMethod?: string,
+    notes?: string,
+  ): Promise<Payment> {
+    const response = await fetch(`${this.baseUrl}/payments/${paymentId}/mark-paid`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        paidAmount,
+        paidDate: new Date().toISOString(),
+        paymentMethod,
+        notes,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to mark as paid');
+    }
+
+    return response.json();
   }
 }
 
-export const paymentApi = new PaymentApiClient();
+export const paymentApi = new PaymentApi();
 
-// Export mock API
-export { mockPaymentApi } from './mockPaymentApi';
-
-// Helper to get the right API client
-export const getPaymentApi = () => {
-  const { shouldUseMock } = require('@/shared/config/api.config');
-  const useMock = shouldUseMock('payments');
-
-  if (useMock) {
-    const { mockPaymentApi } = require('./mockPaymentApi');
-    return mockPaymentApi;
-  }
-
-  return paymentApi;
-};
+// Singleton getter
+export const getPaymentApi = () => paymentApi;

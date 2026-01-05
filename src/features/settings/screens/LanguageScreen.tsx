@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { List, RadioButton, Text, Appbar, Snackbar } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
-import { changeLanguage, getAvailableLanguages, getCurrentLanguage } from '@/shared/i18n';
+import { changeLanguage, getAvailableLanguages, getCurrentLanguage } from '@/infrastructure/i18n';
 
 export default function LanguageScreen({ navigation }: any) {
   const { t } = useTranslation();

@@ -19,6 +19,8 @@ export { Card, CardTitle, CardContent, CardCover, CardActions } from './Card';
 export { Input } from './Input';
 export { Badge } from './Badge';
 export { Avatar } from './Avatar';
+export { PaymentStatusBadge } from './PaymentStatusBadge';
+export type { PaymentStatus } from './PaymentStatusBadge';
 
 // State Components
 export { Loading, Skeleton } from './Loading';

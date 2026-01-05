@@ -42,6 +42,7 @@ export function EditTenantModal({
   const [phone, setPhone] = useState('');
   const [moveInDate, setMoveInDate] = useState(new Date());
   const [paymentDueDay, setPaymentDueDay] = useState(1);
+  const [paymentDueDayText, setPaymentDueDayText] = useState('1'); // Separate text state
   const [showMoveInDatePicker, setShowMoveInDatePicker] = useState(false);
 
   // Validation errors
@@ -58,13 +59,16 @@ export function EditTenantModal({
           ? new Date(room.currentTenant.moveInDate)
           : new Date()
       );
-      setPaymentDueDay(room.currentTenant.paymentDueDay || 1);
+      const dueDay = room.currentTenant.paymentDueDay || 1;
+      setPaymentDueDay(dueDay);
+      setPaymentDueDayText(dueDay.toString());
     } else if (visible && !room.currentTenant) {
       // Reset form for new tenant
       setName('');
       setPhone('');
       setMoveInDate(new Date());
       setPaymentDueDay(1);
+      setPaymentDueDayText('1');
     }
     // Clear errors when modal opens
     setNameError('');
@@ -229,11 +233,37 @@ export function EditTenantModal({
             {/* Payment Due Day */}
             <TextInput
               label={t('rooms.tenant.paymentDueDate')}
-              value={paymentDueDay.toString()}
+              value={paymentDueDayText}
               onChangeText={(text) => {
-                const num = parseInt(text) || 1;
-                if (num >= 1 && num <= 31) {
+                // Allow empty string and any digits for editing
+                setPaymentDueDayText(text);
+                
+                // Parse and validate
+                if (text === '') {
+                  // Don't update paymentDueDay yet, wait for user to finish typing
+                  return;
+                }
+                
+                const num = parseInt(text, 10);
+                // Only update paymentDueDay if it's a valid number between 1-31
+                if (!isNaN(num) && num >= 1 && num <= 31) {
                   setPaymentDueDay(num);
+                }
+              }}
+              onBlur={() => {
+                // When user leaves the field, ensure we have a valid value
+                if (paymentDueDayText === '' || parseInt(paymentDueDayText, 10) < 1) {
+                  setPaymentDueDay(1);
+                  setPaymentDueDayText('1');
+                } else {
+                  const num = parseInt(paymentDueDayText, 10);
+                  if (num > 31) {
+                    setPaymentDueDay(31);
+                    setPaymentDueDayText('31');
+                  } else {
+                    setPaymentDueDay(num);
+                    setPaymentDueDayText(num.toString());
+                  }
                 }
               }}
               mode="outlined"

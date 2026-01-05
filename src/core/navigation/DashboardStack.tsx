@@ -8,7 +8,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { DashboardStackParamList } from '@/shared/types/navigation';
 
 // Screens
-import DashboardScreen from '@/features/dashboard/screens/DashboardScreen';
+import { DashboardScreen } from '@/features/dashboard/screens/DashboardScreen';
 
 const Stack = createNativeStackNavigator<DashboardStackParamList>();
 

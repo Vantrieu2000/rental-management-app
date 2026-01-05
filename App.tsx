@@ -6,14 +6,16 @@
 // Note: global.css is for web only, not needed for React Native
 // import './global.css';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PaperProvider } from 'react-native-paper';
 
 // Import i18n initialization
-import { initI18n } from './src/shared/i18n';
+import './src/infrastructure/i18n/config';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './src/infrastructure/i18n/config';
 
 // Import theme
 import { lightTheme } from './src/shared/config/theme';
@@ -59,54 +61,30 @@ class ErrorBoundary extends React.Component<
 }
 
 export default function App() {
-  const [isI18nInitialized, setIsI18nInitialized] = useState(false);
-
-  useEffect(() => {
-    // Initialize i18n
-    initI18n()
-      .then(() => {
-        console.log('i18n initialized successfully');
-        setIsI18nInitialized(true);
-      })
-      .catch((error) => {
-        console.error('Failed to initialize i18n:', error);
-        // Still set as initialized to prevent infinite loading
-        setIsI18nInitialized(true);
-      });
-  }, []);
-
-  // Show loading screen while i18n is initializing
-  if (!isI18nInitialized) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#2196F3" />
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
-    );
-  }
-
   console.log('App component rendering...');
   
   return (
     <ErrorBoundary>
-      <SafeAreaProvider>
-        <QueryProvider>
-          <PaperProvider theme={lightTheme}>
-            <NavigationContainer
-              onReady={() => console.log('Navigation ready')}
-              onStateChange={(state) => console.log('Navigation state changed:', state)}
-              fallback={
-                <View style={styles.loadingContainer}>
-                  <Text>Loading...</Text>
-                </View>
-              }
-            >
-              <RootNavigator />
-            </NavigationContainer>
-            <StatusBar style="auto" />
-          </PaperProvider>
-        </QueryProvider>
-      </SafeAreaProvider>
+      <I18nextProvider i18n={i18n}>
+        <SafeAreaProvider>
+          <QueryProvider>
+            <PaperProvider theme={lightTheme}>
+              <NavigationContainer
+                onReady={() => console.log('Navigation ready')}
+                onStateChange={(state) => console.log('Navigation state changed:', state)}
+                fallback={
+                  <View style={styles.loadingContainer}>
+                    <Text>Loading...</Text>
+                  </View>
+                }
+              >
+                <RootNavigator />
+              </NavigationContainer>
+              <StatusBar style="auto" />
+            </PaperProvider>
+          </QueryProvider>
+        </SafeAreaProvider>
+      </I18nextProvider>
     </ErrorBoundary>
   );
 }

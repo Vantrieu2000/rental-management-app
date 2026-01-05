@@ -1,3 +1,17 @@
+// Load environment variables từ file .env
+require('dotenv').config({
+  path: process.env.NODE_ENV === 'production' 
+    ? '.env.production' 
+    : '.env.development'
+});
+
+// Fallback to .env if .env.development doesn't exist
+if (!process.env.API_URL) {
+  require('dotenv').config({ path: '.env' });
+}
+
+console.log('📋 Loading Expo config with API_URL:', process.env.API_URL);
+
 module.exports = {
   expo: {
     name: "Rental Management",

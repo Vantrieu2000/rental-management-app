@@ -171,6 +171,7 @@ export const useAuth = () => {
 
   return {
     user,
+    accessToken,
     isAuthenticated,
     isLoading,
     error,
