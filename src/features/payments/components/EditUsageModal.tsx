@@ -324,7 +324,6 @@ const styles = StyleSheet.create({
     margin: 20,
     padding: 20,
     borderRadius: 12,
-    maxHeight: '90%',
   },
   title: {
     fontWeight: 'bold',

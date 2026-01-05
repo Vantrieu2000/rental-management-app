@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList, Alert } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import {
   Text,
   Card,
@@ -132,7 +132,7 @@ export function PaymentHistory({ roomId, onEditUsage }: PaymentHistoryProps) {
 
   const renderPaymentItem = ({ item }: { item: Payment }) => {
     return (
-    <Card style={styles.paymentCard}>
+    <Card key={item._id} style={styles.paymentCard}>
       <Card.Content>
         <View style={styles.header}>
           <View style={styles.periodContainer}>
@@ -292,12 +292,11 @@ export function PaymentHistory({ roomId, onEditUsage }: PaymentHistoryProps) {
       <Text variant="titleLarge" style={styles.title}>
         {t('payments.history.title', 'Payment History')}
       </Text>
-      <FlatList
-        data={payments}
-        renderItem={renderPaymentItem}
-        keyExtractor={(item) => item._id}
-        contentContainerStyle={styles.listContent}
-      />
+      
+      {/* Render payments directly without FlatList */}
+      <View style={styles.listContent}>
+        {payments.map((item) => renderPaymentItem({ item }))}
+      </View>
 
       {/* Confirmation Dialog */}
       <Portal>
@@ -373,7 +372,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   statusChip: {
-    height: 28,
+    height: 32,
   },
   editButton: {
     margin: 0,
