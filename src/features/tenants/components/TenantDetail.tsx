@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statusChip: {
-    height: 28,
+    height: 32,
   },
   activeChip: {
     backgroundColor: '#E8F5E9',

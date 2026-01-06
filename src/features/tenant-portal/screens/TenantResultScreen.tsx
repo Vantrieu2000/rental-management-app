@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+    marginTop: 24,
   },
   title: {
     fontWeight: 'bold',
@@ -250,11 +251,12 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   statusChip: {
-    height: 28,
+    height: 32,
   },
   statusText: {
     color: '#fff',
     fontSize: 12,
+    lineHeight: 18,
     fontWeight: '600',
   },
   divider: {

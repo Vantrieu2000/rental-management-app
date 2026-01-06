@@ -9,18 +9,18 @@ const resources = {
   vi: { translation: vi },
 };
 
-// Get device locale, default to 'en' if not supported
+// Get device locale, default to 'vi' (Vietnamese) if not supported
 const locales = getLocales();
-const deviceLocale = locales && locales.length > 0 ? locales[0].languageCode : 'en';
+const deviceLocale = locales && locales.length > 0 ? locales[0].languageCode : 'vi';
 const supportedLocales = ['en', 'vi'];
-const initialLocale = supportedLocales.includes(deviceLocale || 'en') ? deviceLocale : 'en';
+const initialLocale = supportedLocales.includes(deviceLocale || 'vi') ? deviceLocale : 'vi';
 
 i18n
   .use(initReactI18next)
   .init({
     resources,
     lng: initialLocale,
-    fallbackLng: 'en',
+    fallbackLng: 'vi', // Changed from 'en' to 'vi'
     interpolation: {
       escapeValue: false, // React already escapes values
     },

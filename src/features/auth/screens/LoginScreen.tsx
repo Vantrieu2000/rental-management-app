@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/auth.store';
 import { authApi } from '../services/authApi';
 import type { AuthStackScreenProps } from '@/shared/types/navigation';
+import { AdBanner } from '@/shared/components/AdBanner';
 
 type Props = AuthStackScreenProps<'Login'>;
 
@@ -68,6 +69,9 @@ export default function LoginScreen({ navigation }: Props) {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      {/* Ad Banner at top */}
+      <AdBanner />
+      
       <View style={styles.content}>
         <Card style={styles.card}>
           <Card.Content>

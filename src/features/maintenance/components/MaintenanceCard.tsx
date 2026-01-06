@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusChip: {
-    height: 28,
+    height: 32,
   },
   statusChipText: {
     fontSize: 12,

@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   statusChip: {
-    height: 28,
+    height: 32,
   },
   occupiedChip: {
     backgroundColor: '#E8F5E9',

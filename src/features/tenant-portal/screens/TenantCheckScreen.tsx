@@ -16,6 +16,7 @@ import {
 } from 'react-native-paper';
 import { useCheckPayment } from '../hooks/useTenantPortal';
 import { TenantPaymentResult } from '../types';
+import { AdBanner } from '@/shared/components/AdBanner';
 
 interface TenantCheckScreenProps {
   navigation: any;
@@ -67,6 +68,9 @@ export function TenantCheckScreen({ navigation }: TenantCheckScreenProps) {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      {/* Ad Banner at top */}
+      <AdBanner />
+      
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"

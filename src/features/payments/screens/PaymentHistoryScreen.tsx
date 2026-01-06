@@ -361,11 +361,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   statusChip: {
-    height: 28,
+    height: 32,
   },
   statusText: {
     color: '#fff',
     fontSize: 12,
+    lineHeight: 18,
     fontWeight: '600',
   },
   cardBody: {

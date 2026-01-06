@@ -16,6 +16,8 @@ import {
 } from 'react-native-paper';
 import { format } from 'date-fns';
 import { TenantPaymentResult } from '../types';
+import { BankQRCode } from '@/shared/components/BankQRCode';
+import { AdBanner } from '@/shared/components/AdBanner';
 
 interface TenantDetailScreenProps {
   route: {
@@ -78,6 +80,9 @@ export function TenantDetailScreen({ route, navigation }: TenantDetailScreenProp
         </Text>
         <View style={{ width: 40 }} />
       </View>
+
+      {/* Ad Banner */}
+      <AdBanner />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Room Info Card */}
@@ -283,6 +288,15 @@ export function TenantDetailScreen({ route, navigation }: TenantDetailScreenProp
           </Card>
         )}
 
+        {/* QR Code for Payment */}
+        {result.latestPayment && result.latestPayment.status !== 'paid' && (
+          <BankQRCode
+            amount={result.latestPayment.totalAmount - result.latestPayment.paidAmount}
+            description={`${result.room.roomCode} T${result.latestPayment.billingMonth}/${result.latestPayment.billingYear}`}
+            style={styles.card}
+          />
+        )}
+
         {/* Payment History */}
         {result.paymentHistory.length > 0 && (
           <Card style={styles.card}>
@@ -342,6 +356,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 8,
     paddingVertical: 8,
+    marginTop : 24,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
@@ -387,11 +402,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statusChip: {
-    height: 28,
+    height: 32,
   },
   statusText: {
     color: '#fff',
     fontSize: 12,
+    lineHeight: 18,
     fontWeight: '600',
   },
   divider: {
@@ -483,11 +499,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   historyStatusChip: {
-    height: 24,
+    height: 32,
   },
   historyStatusText: {
     color: '#fff',
     fontSize: 10,
+    lineHeight: 18,
     fontWeight: '600',
   },
 });
